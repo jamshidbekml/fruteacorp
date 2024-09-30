@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ROLE {
+  superadmin
+  operator
+  packman
+}
+
+enum STATUS {
+  active
+  inactive
+}
+
+enum ORDER_STATUS {
+  created
+  pending_payment
+  paid
+  cancelled
+  onway
+}
+
+model Users {
+  id           String  @id @default(uuid()) @db.Uuid
+  firstName    String
+  lastName     String
+  phone        String
+  password     String
+  refreshToken String?
+  role         ROLE
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Clients {
+  id           String  @id @default(uuid()) @db.Uuid
+  firstName    String
+  lastName     String
+  phone        String
+  password     String
+  refreshToken String?
+
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  cart      CartItem[]
+  wishlist  LikedProducts[]
+  Orders    Orders[]
+
+  @@map("clients")
+}
+
+model LikedProducts {
+  id        String   @id @default(uuid()) @db.Uuid
+  clientId  String   @db.Uuid
+  client    Clients  @relation(fields: [clientId], references: [id])
+  productId String   @db.Uuid
+  product   Products @relation(fields: [productId], references: [id])
+
+  @@index([clientId])
+  @@map("liked-products")
+}
+
+model CartItem {
+  id        String   @id @default(uuid()) @db.Uuid
+  clientId  String   @unique @db.Uuid
+  client    Clients  @relation(fields: [clientId], references: [id])
+  productId String   @db.Uuid
+  product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int
+
+  @@map("cart-items")
+}
+
+model Categories {
+  id    String @id @default(uuid()) @db.Uuid
+  title Json
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  products  Products[]
+
+  @@map("categories")
+}
+
+model Products {
+  id                String          @id @default(uuid()) @db.Uuid
+  title             Json
+  photos            Json
+  description       Json
+  amount            Decimal         @default(0) @db.Decimal(10, 2)
+  discountAmount    Decimal         @default(0) @db.Decimal(10, 2)
+  discountStatus    STATUS          @default(inactive)
+  discountExpiresAt DateTime
+  active            Boolean         @default(false)
+  categoryId        String          @db.Uuid
+  category          Categories      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  cartItem          CartItem[]
+  likedBy           LikedProducts[]
+
+  @@map("products")
+}
+
+model Orders {
+  id          String       @id @default(uuid()) @db.Uuid
+  clientId    String       @db.Uuid
+  client      Clients      @relation(fields: [clientId], references: [id])
+  totalAmount Decimal      @db.Decimal(10, 2)
+  orderItems  Json
+  status      ORDER_STATUS @default(created)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("orders")
+}
