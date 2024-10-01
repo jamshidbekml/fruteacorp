@@ -19,14 +19,14 @@ export class AuthService {
   ) {}
 
   async signin(data: AuthDto) {
-    const user = await this.userService.findByUsername(data.username);
-    if (!user) throw new BadRequestException('User not found');
+    const user = await this.userService.findByPhone(data.phone);
+    if (!user) throw new BadRequestException('Bunday foydalanuvchi topilmadi!');
 
     const passwordMatches = await argon2.verify(user.password, data.password);
     if (!passwordMatches)
-      throw new UnauthorizedException('Password does not match');
+      throw new UnauthorizedException('Parol noto`g`ri kiritilgan!');
 
-    const tokens = await this.getTokens(user.id, user.username, user.role);
+    const tokens = await this.getTokens(user.id, user.phone, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken.token);
 
     return { ...tokens, role: user.role };
@@ -96,7 +96,7 @@ export class AuthService {
     );
     if (!refreshTokenMatches)
       throw new ForbiddenException('Tokenlar mos emas!');
-    const tokens = await this.getTokens(user.id, user.username, user.role);
+    const tokens = await this.getTokens(user.id, user.phone, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken.token);
     return tokens;
   }
@@ -111,7 +111,7 @@ export class AuthService {
     return argon2.hash(data);
   }
 
-  async getMe(username: string) {
-    return await this.userService.findByid(username);
+  async getMe(id: string) {
+    return await this.userService.findByid(id);
   }
 }

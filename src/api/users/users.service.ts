@@ -1,26 +1,110 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async create(createUserDto: CreateUserDto) {
+    const isExist = await this.prismaService.users.findFirst({
+      where: {
+        OR: [{ phone: createUserDto.phone }],
+      },
+    });
+
+    if (isExist)
+      throw new BadRequestException(
+        `Bunday raqamli foydalanuvchi allaqachon mavjud!`,
+      );
+
+    createUserDto.password = await argon2.hash(createUserDto.password);
+
+    return await this.prismaService.users.create({ data: createUserDto });
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findByPhone(phone: string) {
+    return await this.prismaService.users.findUnique({ where: { phone } });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findByid(id: string) {
+    const user = await this.prismaService.users.findUnique({
+      where: { id },
+    });
+
+    if (!user) throw new NotFoundException('Foydalanuvchi topilmadi!');
+
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async findAll(page: number, limit: number, search?: string) {
+    const users = await this.prismaService.users.findMany({
+      ...(search
+        ? {
+            where: {
+              OR: [
+                { firstName: { contains: search, mode: 'insensitive' } },
+                { lastName: { contains: search, mode: 'insensitive' } },
+                { phone: { contains: search, mode: 'insensitive' } },
+              ],
+            },
+          }
+        : {}),
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        id: true,
+        phone: true,
+        role: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    const total = await this.prismaService.users.count({
+      ...(search
+        ? {
+            where: {
+              OR: [
+                { firstName: { contains: search, mode: 'insensitive' } },
+                { lastName: { contains: search, mode: 'insensitive' } },
+                { phone: { contains: search, mode: 'insensitive' } },
+              ],
+            },
+          }
+        : {}),
+    });
+
+    return {
+      data: users,
+      pageSize: limit,
+      current: page,
+      total,
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const user = await this.findByid(id);
+
+    return await this.prismaService.users.update({
+      where: { id: user.id },
+      data: updateUserDto,
+    });
+  }
+
+  async remove(id: string) {
+    const user = await this.findByid(id);
+
+    await this.prismaService.users.delete({ where: { id: user.id } });
+
+    return 'Foydalanuvchi muvaffaqiyatli o`chirildi!';
   }
 }

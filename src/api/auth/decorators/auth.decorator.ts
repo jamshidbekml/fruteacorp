@@ -12,16 +12,48 @@ export function SignIn(routeName: string) {
       schema: {
         type: 'object',
         properties: {
-          username: {
+          phone: {
             type: 'string',
-            example: 'test',
+            example: '+998901234567',
           },
           password: {
             type: 'string',
             example: 'test',
           },
         },
-        required: ['username', 'password'],
+        required: ['phone', 'password'],
+      },
+    }),
+    Post(routeName),
+  );
+}
+
+export function SignUp(routeName: string) {
+  return applyDecorators(
+    Public(),
+    ApiOperation({ summary: 'Sign Up' }),
+    ApiBody({
+      schema: {
+        type: 'object',
+        properties: {
+          firstName: {
+            type: 'string',
+            example: 'John',
+          },
+          lastName: {
+            type: 'string',
+            example: 'Doe',
+          },
+          phone: {
+            type: 'string',
+            example: '+998901234567',
+          },
+          password: {
+            type: 'string',
+            example: 'test',
+          },
+        },
+        required: ['phone', 'password'],
       },
     }),
     Post(routeName),

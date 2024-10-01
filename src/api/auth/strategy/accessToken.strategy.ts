@@ -24,13 +24,13 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: JwtPayload) {
-    const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.users.findUnique({
       where: {
         id: payload.sub,
       },
     });
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('Bunday foydalanuvchi topilmadi!');
 
     return {
       sub: user.id,

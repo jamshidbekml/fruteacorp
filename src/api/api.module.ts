@@ -3,23 +3,27 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
-import { ClientsModule } from './clients/clients.module';
 import { OrdersModule } from './orders/orders.module';
 import { CartModule } from './cart/cart.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { PrismaModule } from './prisma/prisma.module';
-
+import { APP_GUARD } from '@nestjs/core';
+import { AccessTokenGuard } from './auth/guards/accessToken.guard';
+import { RolesGuard } from './auth/guards/role.guard';
 @Module({
   imports: [
     AuthModule,
     UsersModule,
     CategoriesModule,
     ProductsModule,
-    ClientsModule,
     OrdersModule,
     CartModule,
     WishlistModule,
     PrismaModule,
+  ],
+  providers: [
+    { provide: APP_GUARD, useClass: AccessTokenGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
 export class ApiModule {}
