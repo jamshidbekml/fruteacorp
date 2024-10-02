@@ -34,6 +34,7 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     return {
       sub: user.id,
+      role: user.role,
     };
   }
 }

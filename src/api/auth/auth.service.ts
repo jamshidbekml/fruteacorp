@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service';
-import { AuthDto } from './dto/auth.dto';
+import { AuthDto, SignupDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +28,14 @@ export class AuthService {
 
     const tokens = await this.getTokens(user.id, user.phone, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken.token);
+
+    return { ...tokens, role: user.role };
+  }
+
+  async signup(data: SignupDto) {
+    const user = await this.userService.create(data);
+
+    const tokens = await this.getTokens(user.id, user.phone, user.role);
 
     return { ...tokens, role: user.role };
   }

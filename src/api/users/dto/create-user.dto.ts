@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ROLE, Users } from '@prisma/client';
-import { IsDefined, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsDefined,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateUserDto implements Partial<Users> {
   @ApiProperty({ description: `Field to enter firstname`, required: true })
@@ -31,12 +37,12 @@ export class CreateUserDto implements Partial<Users> {
   phone: string;
 
   @ApiProperty({
-    description: `Field to enter user's role`,
-    required: true,
+    description: `Field to enter user's role. Default value: 'user'`,
+    required: false,
     enum: ROLE,
   })
-  @IsDefined()
+  @IsOptional()
   @IsNotEmpty()
   @IsEnum(ROLE)
-  role: ROLE;
+  role?: ROLE;
 }
