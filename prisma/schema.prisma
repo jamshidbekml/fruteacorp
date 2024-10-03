@@ -31,19 +31,20 @@ enum ORDER_STATUS {
   paid
   cancelled
   onway
+  delivered
 }
 
 model Users {
-  id           String  @id @default(uuid()) @db.Uuid
+  id           String          @id @default(uuid()) @db.Uuid
   firstName    String
   lastName     String
-  phone        String  @unique
+  phone        String          @unique
   password     String
   refreshToken String?
-  role         ROLE @default(user)
-  cart      CartItem[]
-  wishlist  LikedProducts[]
-  Orders    Orders[]
+  role         ROLE            @default(user)
+  cart         CartItem[]
+  wishlist     LikedProducts[]
+  Orders       Orders[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -54,29 +55,32 @@ model Users {
 model LikedProducts {
   id        String   @id @default(uuid()) @db.Uuid
   clientId  String   @db.Uuid
-  client    Users  @relation(fields: [clientId], references: [id])
+  client    Users    @relation(fields: [clientId], references: [id])
   productId String   @db.Uuid
   product   Products @relation(fields: [productId], references: [id])
 
   @@index([clientId])
-  @@map("liked-products")
+  @@map("liked_products")
 }
 
 model CartItem {
   id        String   @id @default(uuid()) @db.Uuid
-  clientId  String   @unique @db.Uuid
-  client    Users  @relation(fields: [clientId], references: [id])
+  userId    String   @unique @db.Uuid
+  user      Users    @relation(fields: [userId], references: [id])
   productId String   @db.Uuid
   product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderId   String   @db.Uuid
+  order     Orders   @relation(fields: [orderId], references: [id])
   quantity  Int
+  price     Decimal  @db.Decimal(10, 2)
 
-  @@map("cart-items")
+  @@map("cart_items")
 }
 
 model Categories {
-  id    String @id @default(uuid()) @db.Uuid
-  title Json
-
+  id        String     @id @default(uuid()) @db.Uuid
+  title_uz  String
+  title_ru  String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   products  Products[]
@@ -86,9 +90,11 @@ model Categories {
 
 model Products {
   id                String          @id @default(uuid()) @db.Uuid
-  title             Json
+  title_uz          String
+  title_ru          String
   photos            Json
-  description       Json
+  description_uz    String
+  description_ru    String
   amount            Decimal         @default(0) @db.Decimal(10, 2)
   discountAmount    Decimal         @default(0) @db.Decimal(10, 2)
   discountStatus    STATUS          @default(inactive)
@@ -100,19 +106,62 @@ model Products {
   updatedAt         DateTime        @updatedAt
   cartItem          CartItem[]
   likedBy           LikedProducts[]
+  images            ProductImages[]
 
   @@map("products")
 }
 
+model Images {
+  id            String          @id @default(uuid()) @db.Uuid
+  name          String
+  src           String
+  size          BigInt
+  ext           String
+  mimetype      String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  productImages ProductImages[]
+
+  @@map("images")
+}
+
+model ProductImages {
+  id        String   @id @default(uuid()) @db.Uuid
+  productId String   @db.Uuid
+  product   Products @relation(fields: [productId], references: [id])
+  imageId   String   @db.Uuid
+  image     Images   @relation(fields: [imageId], references: [id])
+  isMain    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("product_images")
+}
+
 model Orders {
   id          String       @id @default(uuid()) @db.Uuid
-  clientId    String       @db.Uuid
-  client      Users      @relation(fields: [clientId], references: [id])
-  totalAmount Decimal      @db.Decimal(10, 2)
-  orderItems  Json
+  userId      String       @db.Uuid
+  user        Users        @relation(fields: [userId], references: [id])
+  totalAmount Decimal      @default(0) @db.Decimal(10, 2)
+  orderItems  CartItem[]
   status      ORDER_STATUS @default(created)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
   @@map("orders")
+}
+
+model Transactions {
+  id String @id @default(uuid()) @db.Uuid
+  orederId String @db.Uuid
+  userId String @db.Uuid
+  amount Int
+  reason Int
+  state Int
+  performTime DateTime
+  cancelTime DateTime
+  createdAt DateTime
+  updatedAt DateTime @updatedAt
+
+  @@map("transactions")
 }

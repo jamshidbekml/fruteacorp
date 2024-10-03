@@ -1,34 +1,66 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Req } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
+import { Request } from 'express';
+import { CreateCartDto, RemoveCartDto } from './dto/create-cart.dto';
+import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @Post()
-  create(@Body() createCartDto: CreateCartDto) {
-    return this.cartService.create(createCartDto);
-  }
-
+  @ApiOperation({ summary: 'Get cart' })
   @Get()
-  findAll() {
-    return this.cartService.findAll();
+  get(@Req() req: Request) {
+    const user = req['user'] as { sub: string };
+    return this.cartService.get(user.sub);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cartService.findOne(+id);
+  @ApiOperation({ summary: 'Add product to cart' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        productId: {
+          type: 'string',
+          description: "Maxsulotnig ID'si UUID",
+        },
+        price: {
+          type: 'number',
+          description: 'Maxsulotning narxi',
+        },
+      },
+    },
+  })
+  @Post('add/:id')
+  add(
+    @Req() req: Request,
+    @Param('cartId') cartId: string,
+    @Body() body: CreateCartDto,
+  ) {
+    const user = req['user'] as { sub: string };
+    return this.cartService.addItem(user.sub, cartId, body);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
-    return this.cartService.update(+id, updateCartDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartService.remove(+id);
+  @ApiOperation({ summary: 'Remove product from cart' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        productId: {
+          type: 'string',
+          description: "Maxsulotnig ID'si UUID",
+        },
+      },
+    },
+  })
+  @Post('remove/:id')
+  remove(
+    @Req() req: Request,
+    @Param('cartId') cartId: string,
+    @Body() body: RemoveCartDto,
+  ) {
+    const user = req['user'] as { sub: string };
+    return this.cartService.removeItem(user.sub, cartId, body.productId);
   }
 }

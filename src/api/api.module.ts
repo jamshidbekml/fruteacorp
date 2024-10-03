@@ -7,9 +7,11 @@ import { OrdersModule } from './orders/orders.module';
 import { CartModule } from './cart/cart.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AccessTokenGuard } from './auth/guards/accessToken.guard';
 import { RolesGuard } from './auth/guards/role.guard';
+import { TransformInterceptor } from './interceptors/transform.interceptor';
+import { TransactionsModule } from './transactions/transactions.module';
 @Module({
   imports: [
     AuthModule,
@@ -20,10 +22,12 @@ import { RolesGuard } from './auth/guards/role.guard';
     CartModule,
     WishlistModule,
     PrismaModule,
+    TransactionsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AccessTokenGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
   ],
 })
 export class ApiModule {}
