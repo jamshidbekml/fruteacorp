@@ -7,6 +7,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as argon2 from 'argon2';
+import { ROLE } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -91,8 +92,21 @@ export class UsersService {
     };
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    role?: ROLE,
+    sub?: string,
+  ) {
     const user = await this.findByid(id);
+
+    if (updateUserDto?.role && ROLE.superadmin !== role)
+      throw new BadRequestException('Foydalanuvchi admin bo`lishi kerak');
+
+    if (sub === id && updateUserDto.role)
+      throw new BadRequestException(
+        'Siz o`zingiz uchun rolni o`zgartirishingiz mumkin emas!',
+      );
 
     return await this.prismaService.users.update({
       where: { id: user.id },

@@ -72,11 +72,17 @@ export class ProductsService {
     }
   }
 
-  async findAll(page: number, limit: number, search?: string) {
+  async findAll(
+    page: number,
+    limit: number,
+    search?: string,
+    categoryId?: string,
+  ) {
     const data = await this.prismaService.products.findMany({
-      ...(search
-        ? {
-            where: {
+      where: {
+        ...(categoryId ? { categoryId } : {}),
+        ...(search
+          ? {
               OR: [
                 {
                   title_ru: {
@@ -91,13 +97,13 @@ export class ProductsService {
                   },
                 },
               ],
-            },
-          }
-        : {}),
+            }
+          : {}),
+      },
       include: {
         images: {
           where: { isMain: true },
-          select: { image: { select: { name: true } } },
+          select: { image: { select: { name: true } }, isMain: true },
         },
       },
       skip: (page - 1) * limit,
@@ -105,9 +111,10 @@ export class ProductsService {
     });
 
     const total = await this.prismaService.products.count({
-      ...(search
-        ? {
-            where: {
+      where: {
+        ...(categoryId ? { categoryId } : {}),
+        ...(search
+          ? {
               OR: [
                 {
                   title_ru: {
@@ -122,23 +129,40 @@ export class ProductsService {
                   },
                 },
               ],
-            },
-          }
-        : {}),
+            }
+          : {}),
+      },
     });
 
     return { data, total, pageSize: limit, current: page };
   }
 
-  // findOne(id: string) {
-  //   return `This action returns a #${id} product`;
-  // }
+  async findOne(id: string) {
+    const product = await this.prismaService.products.findUnique({
+      where: { id },
+      include: {
+        images: {
+          select: {
+            image: { select: { name: true } },
+            isMain: true,
+          },
+        },
+      },
+    });
+
+    if (!product) throw new BadRequestException('Mahsulot topilmadi!');
+
+    return product;
+  }
 
   // update(id: number, updateProductDto: UpdateProductDto) {
   //   return `This action updates a #${id} product`;
   // }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} product`;
-  // }
+  async remove(id: string) {
+    const poroduct = await this.findOne(id);
+
+    await this.prismaService.products.delete({ where: { id: poroduct.id } });
+    return 'Mahsulot muvaffaqiyatli o`chirildi!';
+  }
 }

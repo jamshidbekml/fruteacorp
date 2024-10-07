@@ -12,7 +12,7 @@ import { ApiModule } from './api/api.module';
       serveRoot: '/images',
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'uploads', 'premanent'),
+      rootPath: join(__dirname, '..', '..', 'uploads', 'permanent'),
       serveRoot: '/images',
     }),
     ApiModule,

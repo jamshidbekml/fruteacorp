@@ -1,26 +1,57 @@
 import { Injectable } from '@nestjs/common';
-import { CreateWishlistDto } from './dto/create-wishlist.dto';
-import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class WishlistService {
-  create(createWishlistDto: CreateWishlistDto) {
-    return 'This action adds a new wishlist';
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async get(userId: string) {
+    return await this.prismaService.likedProducts.findMany({
+      where: {
+        clientId: userId,
+      },
+      select: {
+        product: {
+          include: {
+            images: {
+              where: {
+                isMain: true,
+              },
+              select: {
+                image: { select: { name: true } },
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all wishlist`;
+  async findOne(id: string, userId: string) {
+    return await this.prismaService.likedProducts.findFirst({
+      where: { productId: id, clientId: userId },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} wishlist`;
-  }
+  async add(id: string, userId: string) {
+    const exist = await this.findOne(id, userId);
+    if (exist) {
+      await this.prismaService.likedProducts.delete({
+        where: {
+          id: exist.id,
+        },
+      });
 
-  update(id: number, updateWishlistDto: UpdateWishlistDto) {
-    return `This action updates a #${id} wishlist`;
-  }
+      return 'Mahsulot muvaffaqiyatli o`chirildi!';
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} wishlist`;
+    await this.prismaService.likedProducts.create({
+      data: {
+        clientId: userId,
+        productId: id,
+      },
+    });
+
+    return 'Mahsulot muvaffaqiyatli qo`shildi!';
   }
 }

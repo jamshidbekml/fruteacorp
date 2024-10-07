@@ -51,7 +51,7 @@ export class CartController {
       },
     },
   })
-  @Post('remove/:id')
+  @Post('remove')
   remove(@Req() req: Request, @Body() body: RemoveCartDto) {
     const user = req['user'] as { sub: string };
     return this.cartService.removeItem(user.sub, body.productId);

@@ -166,4 +166,14 @@ export class CreateProductDto implements Partial<Products> {
   @ArrayNotEmpty()
   @Validate(IsOnlyOneMainImageConstraint)
   images: ImageDto[];
+
+  @ApiProperty({
+    description: `Field to enter product's stock`,
+    type: 'number',
+    default: 0,
+  })
+  @IsOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  stock?: number;
 }

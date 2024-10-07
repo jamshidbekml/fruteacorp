@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -23,6 +24,7 @@ import { ROLE } from '@prisma/client';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dto/user.dto';
 import { Roles } from '../auth/decorators/role.decorator';
+import { Request } from 'express';
 
 @ApiBearerAuth()
 @ApiTags('Users')
@@ -62,30 +64,16 @@ export class UsersController {
   @ApiOperation({ summary: 'Update User' })
   @ApiParam({ name: 'id', type: String })
   @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        username: {
-          type: 'string',
-          example: 'test',
-        },
-        password: {
-          type: 'string',
-          example: 'test',
-        },
-        phone: {
-          type: 'string',
-        },
-        role: {
-          type: 'string',
-          enum: Object.values(ROLE),
-        },
-      },
-    },
+    type: UpdateUserDto,
   })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  update(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const { role, sub } = req['user'] as { role: ROLE; sub: string };
+    return this.usersService.update(id, updateUserDto, role, sub);
   }
 
   @ApiOperation({ summary: 'Delete User' })

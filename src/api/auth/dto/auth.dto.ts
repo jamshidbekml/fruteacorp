@@ -53,9 +53,6 @@ export class GetMeDto {
   id: string;
 
   @Expose()
-  username: string;
-
-  @Expose()
   role: string;
 
   @Expose()

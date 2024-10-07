@@ -98,6 +98,8 @@ model Products {
   discountAmount    Decimal         @default(0) @db.Decimal(10, 2)
   discountStatus    STATUS          @default(inactive)
   discountExpiresAt DateTime?
+  stock             Int             @default(0)
+  sold              Int             @default(0)
   active            Boolean         @default(false)
   categoryId        String          @db.Uuid
   category          Categories      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
