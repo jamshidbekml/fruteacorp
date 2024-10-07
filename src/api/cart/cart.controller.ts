@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Param, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Req } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { Request } from 'express';
 import { CreateCartDto, RemoveCartDto } from './dto/create-cart.dto';
-import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiBearerAuth()
+@ApiTags('Cart')
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
@@ -32,14 +33,10 @@ export class CartController {
       },
     },
   })
-  @Post('add/:id')
-  add(
-    @Req() req: Request,
-    @Param('cartId') cartId: string,
-    @Body() body: CreateCartDto,
-  ) {
+  @Post('add')
+  add(@Req() req: Request, @Body() body: CreateCartDto) {
     const user = req['user'] as { sub: string };
-    return this.cartService.addItem(user.sub, cartId, body);
+    return this.cartService.addItem(user.sub, body);
   }
 
   @ApiOperation({ summary: 'Remove product from cart' })
@@ -55,12 +52,8 @@ export class CartController {
     },
   })
   @Post('remove/:id')
-  remove(
-    @Req() req: Request,
-    @Param('cartId') cartId: string,
-    @Body() body: RemoveCartDto,
-  ) {
+  remove(@Req() req: Request, @Body() body: RemoveCartDto) {
     const user = req['user'] as { sub: string };
-    return this.cartService.removeItem(user.sub, cartId, body.productId);
+    return this.cartService.removeItem(user.sub, body.productId);
   }
 }

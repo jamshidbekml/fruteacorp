@@ -12,6 +12,8 @@ import { AccessTokenGuard } from './auth/guards/accessToken.guard';
 import { RolesGuard } from './auth/guards/role.guard';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { TransactionsModule } from './transactions/transactions.module';
+import { UploadModule } from './upload/upload.module';
+import { TasksModule } from './tasks/tasks.module';
 @Module({
   imports: [
     AuthModule,
@@ -23,6 +25,8 @@ import { TransactionsModule } from './transactions/transactions.module';
     WishlistModule,
     PrismaModule,
     TransactionsModule,
+    UploadModule,
+    TasksModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AccessTokenGuard },

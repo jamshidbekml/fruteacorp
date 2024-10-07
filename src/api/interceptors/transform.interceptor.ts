@@ -25,7 +25,9 @@ export class TransformInterceptor<T>
           ? { message: data, success: true }
           : data?.data
             ? { ...data, success: true }
-            : { data, success: false };
+            : data?.error
+              ? { data, success: false }
+              : { data, success: true };
       }),
     );
   }

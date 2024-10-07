@@ -8,7 +8,11 @@ import { ApiModule } from './api/api.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'uploads'),
+      rootPath: join(__dirname, '..', '..', 'uploads', 'temp'),
+      serveRoot: '/images',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'uploads', 'premanent'),
       serveRoot: '/images',
     }),
     ApiModule,

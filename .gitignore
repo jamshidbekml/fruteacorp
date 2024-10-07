@@ -6,6 +6,10 @@
 #migrations
 /prisma/migrations/*
 
+#uploads
+/uploads/temp/*
+/uploads/permanent/*
+
 # Logs
 logs
 *.log
