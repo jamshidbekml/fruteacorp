@@ -60,4 +60,16 @@ export class GetMeDto {
 
   @Expose()
   phone: string;
+
+  @Expose()
+  firstName: string;
+
+  @Expose()
+  lastName: string;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
 }
