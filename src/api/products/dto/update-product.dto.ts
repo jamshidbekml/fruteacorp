@@ -84,12 +84,12 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   @ApiProperty({
     description: `Field to enter product's category`,
     required: false,
-    type: 'uuid',
+    type: 'string',
     format: 'uuid',
   })
   @IsOptional()
   @IsNotEmpty()
-  @IsUUID('4')
+  @IsUUID()
   categoryId?: string;
 
   @ApiProperty({

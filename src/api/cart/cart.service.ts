@@ -60,7 +60,7 @@ export class CartService {
       await this.prismaService.cartItem.update({
         where: { id: existItem.id },
         data: {
-          quantity: existItem.quantity + 1,
+          quantity: existItem.quantity + cartItemDto.count || 1,
         },
       });
 
@@ -78,7 +78,9 @@ export class CartService {
               id: cartId,
             },
             data: {
-              totalAmount: Number(cartItemDto.price) * (existItem.quantity + 1),
+              totalAmount:
+                Number(cartItemDto.price) *
+                (existItem.quantity + cartItemDto.count || 1),
             },
             select: {
               orderItems: true,
@@ -98,7 +100,7 @@ export class CartService {
           },
           data: {
             totalAmount: {
-              increment: cartItemDto.price,
+              increment: cartItemDto.price * (cartItemDto.count || 1),
             },
           },
           select: {
@@ -118,7 +120,7 @@ export class CartService {
         orderId: cartId,
         productId: cartItemDto.productId,
         price: cartItemDto.price,
-        quantity: 1,
+        quantity: cartItemDto.count || 1,
       },
     });
 
@@ -143,12 +145,14 @@ export class CartService {
       }));
   }
 
-  async removeItem(userId: string, productId: string) {
+  async removeItem(userId: string, body: { productId: string; count: number }) {
     const cart = await this.get(userId);
 
     if (!cart) throw new Error('Savat topilmadi!');
 
-    const existItem = cart.items.find((item) => item.productId === productId);
+    const existItem = cart.items.find(
+      (item) => item.productId === body.productId,
+    );
 
     if (!existItem) throw new Error('Savatda bu mahsulot mavjud emas!');
 
@@ -164,11 +168,11 @@ export class CartService {
       })
       .then((res) => res.id);
 
-    if (existItem.quantity > 1) {
+    if (existItem.quantity > body.count) {
       await this.prismaService.cartItem.update({
         where: { id: existItem.id },
         data: {
-          quantity: { decrement: 1 },
+          quantity: { decrement: body.count },
         },
       });
     } else {
@@ -184,7 +188,11 @@ export class CartService {
         },
         data: {
           totalAmount: {
-            decrement: Number(existItem.price),
+            decrement:
+              Number(existItem.price) *
+              (existItem.quantity >= body.count
+                ? body.count
+                : existItem.quantity),
           },
         },
         select: {

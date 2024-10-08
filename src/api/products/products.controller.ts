@@ -4,6 +4,9 @@ import {
   Post,
   Body,
   Query,
+  Param,
+  Patch,
+  Delete,
   // Patch,
   // Param,
   // Delete,
@@ -14,10 +17,12 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '../auth/decorators/public.decorator';
+import { UpdateProductDto } from './dto/update-product.dto';
 // import { UpdateProductDto } from './dto/update-product.dto';
 
 @ApiTags('Products')
@@ -49,18 +54,27 @@ export class ProductsController {
     return this.productsService.findAll(page, limit, search);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.productsService.findOne(+id);
-  // }
+  @ApiOperation({ summary: 'Get one Product' })
+  @ApiParam({ name: 'id' })
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.productsService.findOne(id);
+  }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-  //   return this.productsService.update(+id, updateProductDto);
-  // }
+  @ApiOperation({ summary: 'Update Product' })
+  @ApiBody({
+    type: UpdateProductDto,
+  })
+  @ApiParam({ name: 'id' })
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+    return this.productsService.update(id, updateProductDto);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.productsService.remove(+id);
-  // }
+  @ApiOperation({ summary: 'Delete Product' })
+  @ApiParam({ name: 'id' })
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.productsService.remove(id);
+  }
 }

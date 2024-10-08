@@ -4,6 +4,8 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { join } from 'path';
 import { move } from 'fs-extra';
+import { deleteFile } from '../shared/utils/deleteFile';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -143,7 +145,7 @@ export class ProductsService {
       include: {
         images: {
           select: {
-            image: { select: { name: true } },
+            image: { select: { name: true, id: true } },
             isMain: true,
           },
         },
@@ -155,14 +157,52 @@ export class ProductsService {
     return product;
   }
 
-  // update(id: number, updateProductDto: UpdateProductDto) {
-  //   return `This action updates a #${id} product`;
-  // }
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    const product = await this.findOne(id);
+
+    const data = await this.prismaService.products.update({
+      where: { id: id },
+      data: {
+        active: updateProductDto?.active || product.active,
+        amount: updateProductDto?.amount || product.amount,
+        description_ru:
+          updateProductDto?.description_ru || product.description_ru,
+        description_uz:
+          updateProductDto?.description_uz || product.description_uz,
+        discountAmount:
+          updateProductDto?.discountAmount || product.discountAmount,
+        discountExpiresAt:
+          updateProductDto?.discountExpiresAt || product.discountExpiresAt,
+        discountStatus:
+          updateProductDto.discountStatus || product.discountStatus,
+        stock: updateProductDto?.stock || product.stock,
+        title_ru: updateProductDto?.title_ru || product.title_ru,
+        title_uz: updateProductDto?.title_uz || product.title_uz,
+        categoryId: updateProductDto?.categoryId || product.categoryId,
+      },
+    });
+
+    if (updateProductDto.images) {
+      for await (const dir of product.images) {
+        for await (const image of updateProductDto.images) {
+          if (image.id === dir.image.id) {
+            deleteFile('premanent', dir.image.name);
+          }
+        }
+      }
+    }
+
+    return data;
+  }
 
   async remove(id: string) {
-    const poroduct = await this.findOne(id);
+    const product = await this.findOne(id);
 
-    await this.prismaService.products.delete({ where: { id: poroduct.id } });
+    for await (const dir of product.images) {
+      deleteFile('premanent', dir.image.name);
+    }
+
+    await this.prismaService.products.delete({ where: { id: product.id } });
     return 'Mahsulot muvaffaqiyatli o`chirildi!';
   }
 }

@@ -1,10 +1,20 @@
 import { unlink } from 'fs';
 import { join } from 'path';
 
-export function deleteFile(fileName: string) {
+export function deleteFile(folder: 'temp' | 'premanent', fileName: string) {
   try {
     unlink(
-      join(__dirname, '..', '..', '..', '..', '..', 'uploads', fileName),
+      join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        '..',
+        '..',
+        'uploads',
+        folder,
+        fileName,
+      ),
       (err) => {
         if (err) console.log(err);
       },
