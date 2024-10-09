@@ -55,6 +55,7 @@ export class ProductsController {
   }
 
   @ApiOperation({ summary: 'Get one Product' })
+  @Public()
   @ApiParam({ name: 'id' })
   @Get(':id')
   findOne(@Param('id') id: string) {
