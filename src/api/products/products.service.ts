@@ -82,7 +82,6 @@ export class ProductsService {
   ) {
     const data = await this.prismaService.products.findMany({
       where: {
-        ...(categoryId ? { categoryId } : {}),
         ...(search
           ? {
               OR: [
@@ -101,6 +100,7 @@ export class ProductsService {
               ],
             }
           : {}),
+        ...(categoryId ? { categoryId } : {}),
       },
       include: {
         images: {
@@ -114,7 +114,6 @@ export class ProductsService {
 
     const total = await this.prismaService.products.count({
       where: {
-        ...(categoryId ? { categoryId } : {}),
         ...(search
           ? {
               OR: [
@@ -133,6 +132,7 @@ export class ProductsService {
               ],
             }
           : {}),
+        ...(categoryId ? { categoryId } : {}),
       },
     });
 
