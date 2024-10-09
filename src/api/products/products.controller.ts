@@ -54,8 +54,8 @@ export class ProductsController {
     return this.productsService.findAll(page, limit, search);
   }
 
-  @ApiOperation({ summary: 'Get one Product' })
   @Public()
+  @ApiOperation({ summary: 'Get one Product' })
   @ApiParam({ name: 'id' })
   @Get(':id')
   findOne(@Param('id') id: string) {
