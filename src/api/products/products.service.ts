@@ -154,6 +154,7 @@ export class ProductsService {
             isMain: true,
           },
         },
+        _count: { select: { inCart: true, likedBy: true } },
       },
     });
 
