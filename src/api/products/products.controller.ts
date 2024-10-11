@@ -62,6 +62,7 @@ export class ProductsController {
     return this.productsService.findOne(id);
   }
 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update Product' })
   @ApiBody({
     type: UpdateProductDto,
@@ -72,6 +73,7 @@ export class ProductsController {
     return this.productsService.update(id, updateProductDto);
   }
 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete Product' })
   @ApiParam({ name: 'id' })
   @Delete(':id')

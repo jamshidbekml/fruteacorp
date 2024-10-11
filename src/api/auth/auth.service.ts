@@ -9,6 +9,8 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service';
 import { AuthDto, SignupDto } from './dto/auth.dto';
+import { generateRandomNumber } from '../shared/utils/code-generator';
+import { smsSender } from '../shared/utils/sms-sender';
 
 @Injectable()
 export class AuthService {
@@ -113,6 +115,17 @@ export class AuthService {
     await this.userService.update(userId, {
       refreshToken: null,
     });
+  }
+
+  async sendOtp(phone: string) {
+    const code = generateRandomNumber(5);
+    const message = `Frutecorp savdo platformasi foydalanuchining parolini o'zgartirish uchun tasdiqlash kodi: ${code}`;
+    const isSent = await smsSender(phone, message);
+
+    if (!isSent)
+      throw new BadRequestException(
+        `Sms ybiorishda xatolik! Texniklar bilan bog'laning`,
+      );
   }
 
   hashData(data: string) {

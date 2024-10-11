@@ -13,8 +13,11 @@ export class CartService {
         status: 'created',
       },
       select: {
-        orderItems: true,
+        orderItems: {
+          include: { product: true },
+        },
         totalAmount: true,
+        id: true,
       },
     });
 
@@ -22,6 +25,7 @@ export class CartService {
       return {
         items: existCart.orderItems,
         totalAmount: existCart.totalAmount,
+        id: existCart.id,
       };
 
     const cart = await this.prismaService.orders.create({
@@ -29,12 +33,19 @@ export class CartService {
         userId: userId,
       },
       select: {
-        orderItems: true,
+        orderItems: {
+          include: { product: true },
+        },
         totalAmount: true,
+        id: true,
       },
     });
 
-    return { items: cart.orderItems, totalAmount: cart.totalAmount };
+    return {
+      items: cart.orderItems,
+      totalAmount: cart.totalAmount,
+      id: cart.id,
+    };
   }
 
   async addItem(userId: string, cartItemDto: CreateCartDto) {
@@ -57,54 +68,43 @@ export class CartService {
       .then((res) => res.id);
 
     if (existItem) {
+      const discount =
+        existItem.product.discountStatus === 'active' &&
+        existItem.product.discountExpiresAt > new Date();
+      const price = discount
+        ? Number(existItem.product.amount) -
+          Number(existItem.product.discountAmount)
+        : Number(existItem.product.amount);
+
+      console.log(existItem.quantity);
+
       await this.prismaService.cartItem.update({
         where: { id: existItem.id },
         data: {
-          quantity: existItem.quantity + cartItemDto.count || 1,
+          price,
+          quantity: { increment: cartItemDto?.count || 1 },
         },
       });
 
-      if (existItem.price != cartItemDto.price) {
-        await this.prismaService.cartItem.update({
-          where: { id: existItem.id },
-          data: {
-            price: cartItemDto.price,
-          },
-        });
-
-        return await this.prismaService.orders
-          .update({
-            where: {
-              id: cartId,
-            },
-            data: {
-              totalAmount:
-                Number(cartItemDto.price) *
-                (existItem.quantity + cartItemDto.count || 1),
-            },
-            select: {
-              orderItems: true,
-              totalAmount: true,
-            },
-          })
-          .then((res) => ({
-            items: res.orderItems,
-            totalAmount: res.totalAmount,
-          }));
-      }
-
+      const decrement = Number(existItem.price) * existItem.quantity;
+      const increment = price * (existItem.quantity + cartItemDto.count || 1);
       return await this.prismaService.orders
         .update({
           where: {
             id: cartId,
           },
           data: {
-            totalAmount: {
-              increment: cartItemDto.price * (cartItemDto.count || 1),
-            },
+            ...(decrement || increment
+              ? {
+                  totalAmount: {
+                    ...(decrement ? { decrement } : {}),
+                    ...(increment ? { increment } : {}),
+                  },
+                }
+              : {}),
           },
           select: {
-            orderItems: true,
+            orderItems: { include: { product: true } },
             totalAmount: true,
           },
         })
@@ -114,12 +114,29 @@ export class CartService {
         }));
     }
 
+    const product = await this.prismaService.products.findUnique({
+      where: { id: cartItemDto.productId },
+      select: {
+        amount: true,
+        discountAmount: true,
+        discountExpiresAt: true,
+        discountStatus: true,
+      },
+    });
+
+    const discount =
+      product.discountStatus === 'active' &&
+      product.discountExpiresAt > new Date();
+    const price = discount
+      ? Number(product.amount) - Number(product.discountAmount)
+      : Number(product.amount);
+
     await this.prismaService.cartItem.create({
       data: {
         userId: userId,
         orderId: cartId,
         productId: cartItemDto.productId,
-        price: cartItemDto.price,
+        price: price,
         quantity: cartItemDto.count || 1,
       },
     });
@@ -131,11 +148,13 @@ export class CartService {
         },
         data: {
           totalAmount: {
-            increment: cartItemDto.price,
+            increment: price * (cartItemDto.count || 1),
           },
         },
         select: {
-          orderItems: true,
+          orderItems: {
+            include: { product: true },
+          },
           totalAmount: true,
         },
       })
@@ -168,11 +187,11 @@ export class CartService {
       })
       .then((res) => res.id);
 
-    if (existItem.quantity > body.count) {
+    if (existItem.quantity > body?.count || 1) {
       await this.prismaService.cartItem.update({
         where: { id: existItem.id },
         data: {
-          quantity: { decrement: body.count },
+          quantity: { decrement: body.count || 1 },
         },
       });
     } else {
@@ -190,13 +209,13 @@ export class CartService {
           totalAmount: {
             decrement:
               Number(existItem.price) *
-              (existItem.quantity >= body.count
-                ? body.count
+              (existItem.quantity >= body.count || 1
+                ? body.count || 1
                 : existItem.quantity),
           },
         },
         select: {
-          orderItems: true,
+          orderItems: { include: { product: true } },
           totalAmount: true,
         },
       })

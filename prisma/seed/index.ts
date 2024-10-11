@@ -2,11 +2,13 @@ import { PrismaClient } from '@prisma/client';
 import 'colors';
 import * as argon2 from 'argon2';
 import { ConfigService } from '@nestjs/config';
+import settingsSeed from './settings';
 
 async function seed() {
   try {
     const config = new ConfigService();
     const prismaClient = new PrismaClient();
+    await settingsSeed(config, prismaClient);
     const exists = await prismaClient.users.findUnique({
       where: { phone: config.get('ADMIN_PHONE') },
     });

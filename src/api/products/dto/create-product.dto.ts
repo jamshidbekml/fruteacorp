@@ -168,12 +168,12 @@ export class CreateProductDto implements Partial<Products> {
   images: ImageDto[];
 
   @ApiProperty({
-    description: `Field to enter product's stock`,
+    description: `Field to enter product's quantity`,
     type: 'number',
     default: 0,
   })
   @IsOptional()
   @IsNotEmpty()
   @IsNumber()
-  stock?: number;
+  inStock?: number;
 }

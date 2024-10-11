@@ -147,12 +147,12 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   images?: ImageDto[];
 
   @ApiProperty({
-    description: `Field to enter product's stock`,
+    description: `Field to enter product's quantity`,
     required: false,
     type: 'number',
   })
   @IsOptional()
   @IsNotEmpty()
   @IsBoolean()
-  stock?: number;
+  inStock?: number;
 }

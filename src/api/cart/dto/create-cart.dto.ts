@@ -1,4 +1,10 @@
-import { IsDefined, IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
+import {
+  IsDefined,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateCartDto {
   @IsDefined()
@@ -6,12 +12,7 @@ export class CreateCartDto {
   @IsUUID()
   productId: string;
 
-  @IsDefined()
-  @IsNotEmpty()
-  @IsNumber()
-  price: any;
-
-  @IsDefined()
+  @IsOptional()
   @IsNotEmpty()
   @IsNumber()
   count: number;
@@ -23,7 +24,7 @@ export class RemoveCartDto {
   @IsUUID()
   productId: string;
 
-  @IsDefined()
+  @IsOptional()
   @IsNotEmpty()
   @IsNumber()
   count: number;

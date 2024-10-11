@@ -26,9 +26,9 @@ export class CartController {
           type: 'string',
           description: "Maxsulotnig ID'si UUID",
         },
-        price: {
+        count: {
           type: 'number',
-          description: 'Maxsulotning narxi',
+          description: 'Mahsulotning soni',
         },
       },
     },
@@ -47,6 +47,10 @@ export class CartController {
         productId: {
           type: 'string',
           description: "Maxsulotnig ID'si UUID",
+        },
+        count: {
+          type: 'number',
+          description: 'Mahsulotning soni',
         },
       },
     },

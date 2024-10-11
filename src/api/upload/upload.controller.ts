@@ -53,7 +53,7 @@ export class UploadController {
   uploadFile(@Req() req: Request, @UploadedFile() image: Express.Multer.File) {
     return this.uploadService.uploadFile(
       image,
-      `${req.protocol}://${req.get('host')}/images/`,
+      `${req.protocol}://${req.get('host')}/temp/images/`,
     );
   }
 }

@@ -14,6 +14,7 @@ import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { TransactionsModule } from './transactions/transactions.module';
 import { UploadModule } from './upload/upload.module';
 import { TasksModule } from './tasks/tasks.module';
+import { PaymeModule } from './payme/payme.module';
 @Module({
   imports: [
     AuthModule,
@@ -27,6 +28,7 @@ import { TasksModule } from './tasks/tasks.module';
     TransactionsModule,
     UploadModule,
     TasksModule,
+    PaymeModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AccessTokenGuard },

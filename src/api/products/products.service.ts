@@ -175,7 +175,7 @@ export class ProductsService {
           updateProductDto?.discountExpiresAt || product.discountExpiresAt,
         discountStatus:
           updateProductDto.discountStatus || product.discountStatus,
-        stock: updateProductDto?.stock || product.stock,
+        inStock: updateProductDto?.inStock || product.inStock,
         title_ru: updateProductDto?.title_ru || product.title_ru,
         title_uz: updateProductDto?.title_uz || product.title_uz,
         categoryId: updateProductDto?.categoryId || product.categoryId,
@@ -203,6 +203,7 @@ export class ProductsService {
     }
 
     await this.prismaService.products.delete({ where: { id: product.id } });
+
     return 'Mahsulot muvaffaqiyatli o`chirildi!';
   }
 }
