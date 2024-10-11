@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
@@ -10,7 +9,6 @@ import {
   Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
   ApiBearerAuth,
@@ -29,18 +27,11 @@ import { NestedSerialize } from '../interceptors/nested-serialize.interceptor';
 
 @ApiBearerAuth()
 @ApiTags('Users')
-@Roles(ROLE.superadmin)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @ApiOperation({ summary: 'Create User' })
-  @ApiBody({ type: CreateUserDto })
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
+  @Roles(ROLE.superadmin)
   @NestedSerialize(UserDto)
   @ApiOperation({ summary: 'Get All Users' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
@@ -55,6 +46,7 @@ export class UsersController {
     return this.usersService.findAll(+page, +limit, search);
   }
 
+  @Roles(ROLE.superadmin)
   @Serialize(UserDto)
   @ApiOperation({ summary: 'Get User By Id' })
   @ApiParam({ name: 'id', type: String })
@@ -75,6 +67,7 @@ export class UsersController {
     });
   }
 
+  @Roles(ROLE.superadmin)
   @Serialize(UserDto)
   @ApiOperation({ summary: 'Update User' })
   @ApiParam({ name: 'id', type: String })
@@ -91,6 +84,7 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto, role, sub);
   }
 
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Delete User' })
   @ApiParam({ name: 'id', type: String })
   @Delete(':id')

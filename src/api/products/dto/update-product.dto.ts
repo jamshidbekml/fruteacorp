@@ -153,6 +153,6 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   })
   @IsOptional()
   @IsNotEmpty()
-  @IsBoolean()
+  @IsNumber()
   inStock?: number;
 }
