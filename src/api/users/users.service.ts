@@ -108,6 +108,7 @@ export class UsersService {
         'Siz o`zingiz uchun rolni o`zgartirishingiz mumkin emas!',
       );
 
+    delete updateUserDto?.phone;
     return await this.prismaService.users.update({
       where: { id: user.id },
       data: updateUserDto,

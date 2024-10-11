@@ -14,11 +14,11 @@ export function SignIn(routeName: string) {
         properties: {
           phone: {
             type: 'string',
-            example: '+998901234567',
+            example: '+998931487733',
           },
           password: {
             type: 'string',
-            example: 'test',
+            example: 'fruteacorp',
           },
         },
         required: ['phone', 'password'],

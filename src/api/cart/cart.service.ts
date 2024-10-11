@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 
@@ -49,13 +49,29 @@ export class CartService {
   }
 
   async addItem(userId: string, cartItemDto: CreateCartDto) {
+    const product = await this.prismaService.products.findUnique({
+      where: { id: cartItemDto.productId },
+      select: {
+        amount: true,
+        discountAmount: true,
+        discountExpiresAt: true,
+        discountStatus: true,
+        inStock: true,
+      },
+    });
+
+    if (product.inStock < (cartItemDto?.count || 1))
+      throw new BadRequestException(
+        `Mahsulot soni ombordagi miqdordan ortiq! Mavjud: ${product.inStock}`,
+      );
+
     const cart = await this.get(userId);
 
     const existItem = cart.items.find(
       (item) => item.productId === cartItemDto.productId,
     );
 
-    const cartId = await this.prismaService.orders
+    const { cartId, totalAmount } = await this.prismaService.orders
       .findFirst({
         where: {
           userId: userId,
@@ -63,9 +79,10 @@ export class CartService {
         },
         select: {
           id: true,
+          totalAmount: true,
         },
       })
-      .then((res) => res.id);
+      .then((res) => ({ cartId: res.id, totalAmount: res.totalAmount }));
 
     if (existItem) {
       const discount =
@@ -76,8 +93,6 @@ export class CartService {
           Number(existItem.product.discountAmount)
         : Number(existItem.product.amount);
 
-      console.log(existItem.quantity);
-
       await this.prismaService.cartItem.update({
         where: { id: existItem.id },
         data: {
@@ -87,21 +102,14 @@ export class CartService {
       });
 
       const decrement = Number(existItem.price) * existItem.quantity;
-      const increment = price * (existItem.quantity + cartItemDto.count || 1);
+      const increment = price * (existItem.quantity + (cartItemDto.count || 1));
       return await this.prismaService.orders
         .update({
           where: {
             id: cartId,
           },
           data: {
-            ...(decrement || increment
-              ? {
-                  totalAmount: {
-                    ...(decrement ? { decrement } : {}),
-                    ...(increment ? { increment } : {}),
-                  },
-                }
-              : {}),
+            totalAmount: Number(totalAmount) + increment - decrement,
           },
           select: {
             orderItems: { include: { product: true } },
@@ -113,16 +121,6 @@ export class CartService {
           totalAmount: res.totalAmount,
         }));
     }
-
-    const product = await this.prismaService.products.findUnique({
-      where: { id: cartItemDto.productId },
-      select: {
-        amount: true,
-        discountAmount: true,
-        discountExpiresAt: true,
-        discountStatus: true,
-      },
-    });
 
     const discount =
       product.discountStatus === 'active' &&
@@ -187,7 +185,7 @@ export class CartService {
       })
       .then((res) => res.id);
 
-    if (existItem.quantity > body?.count || 1) {
+    if (existItem.quantity > (body?.count || 1)) {
       await this.prismaService.cartItem.update({
         where: { id: existItem.id },
         data: {

@@ -131,7 +131,7 @@ model ProductImages {
   id        String   @id @default(uuid()) @db.Uuid
   productId String   @db.Uuid
   product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
-  imageId   String   @db.Uuid
+  imageId   String   @db.Uuid  @unique
   image     Images   @relation(fields: [imageId], references: [id])
   isMain    Boolean  @default(false)
   createdAt DateTime @default(now())

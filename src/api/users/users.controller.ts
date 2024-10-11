@@ -25,6 +25,7 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dto/user.dto';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Request } from 'express';
+import { NestedSerialize } from '../interceptors/nested-serialize.interceptor';
 
 @ApiBearerAuth()
 @ApiTags('Users')
@@ -40,6 +41,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @NestedSerialize(UserDto)
   @ApiOperation({ summary: 'Get All Users' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
@@ -61,6 +63,19 @@ export class UsersController {
     return this.usersService.findByid(id);
   }
 
+  @Serialize(UserDto)
+  @ApiOperation({ summary: 'Self Update User' })
+  @Patch('self')
+  selfUpdate(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
+    const { sub } = req['user'] as { sub: string };
+
+    return this.usersService.update(sub, {
+      firstName: updateUserDto.firstName,
+      lastName: updateUserDto.lastName,
+    });
+  }
+
+  @Serialize(UserDto)
   @ApiOperation({ summary: 'Update User' })
   @ApiParam({ name: 'id', type: String })
   @ApiBody({

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 // import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -158,41 +162,92 @@ export class ProductsService {
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
-    const product = await this.findOne(id);
+    try {
+      const product = await this.findOne(id);
 
-    const data = await this.prismaService.products.update({
-      where: { id: id },
-      data: {
-        active: updateProductDto?.active || product.active,
-        amount: updateProductDto?.amount || product.amount,
-        description_ru:
-          updateProductDto?.description_ru || product.description_ru,
-        description_uz:
-          updateProductDto?.description_uz || product.description_uz,
-        discountAmount:
-          updateProductDto?.discountAmount || product.discountAmount,
-        discountExpiresAt:
-          updateProductDto?.discountExpiresAt || product.discountExpiresAt,
-        discountStatus:
-          updateProductDto.discountStatus || product.discountStatus,
-        inStock: updateProductDto?.inStock || product.inStock,
-        title_ru: updateProductDto?.title_ru || product.title_ru,
-        title_uz: updateProductDto?.title_uz || product.title_uz,
-        categoryId: updateProductDto?.categoryId || product.categoryId,
-      },
-    });
+      const data = await this.prismaService.products.update({
+        where: { id: id },
+        data: {
+          active: updateProductDto?.active || product.active,
+          amount: updateProductDto?.amount || product.amount,
+          description_ru:
+            updateProductDto?.description_ru || product.description_ru,
+          description_uz:
+            updateProductDto?.description_uz || product.description_uz,
+          discountAmount:
+            updateProductDto?.discountAmount || product.discountAmount,
+          discountExpiresAt:
+            updateProductDto?.discountExpiresAt || product.discountExpiresAt,
+          discountStatus:
+            updateProductDto.discountStatus || product.discountStatus,
+          inStock: updateProductDto?.inStock || product.inStock,
+          title_ru: updateProductDto?.title_ru || product.title_ru,
+          title_uz: updateProductDto?.title_uz || product.title_uz,
+          categoryId: updateProductDto?.categoryId || product.categoryId,
+        },
+      });
 
-    if (updateProductDto.images) {
-      for await (const dir of product.images) {
-        for await (const image of updateProductDto.images) {
-          if (image.id === dir.image.id) {
+      if (updateProductDto.images) {
+        const imageIds = updateProductDto.images.map((image) => image.id);
+
+        for await (const dir of product.images) {
+          if (!imageIds.includes(dir.image.id)) {
             deleteFile('premanent', dir.image.name);
           }
         }
-      }
-    }
 
-    return data;
+        await this.prismaService.$transaction(async (prisma) => {
+          for await (const image of updateProductDto.images) {
+            const imageExists = await prisma.productImages.findUnique({
+              where: { imageId: image.id },
+            });
+
+            if (imageExists) continue;
+
+            await prisma.productImages.create({
+              data: {
+                productId: product.id,
+                imageId: image.id,
+                isMain: image.isMain,
+              },
+            });
+
+            const imagePath = await prisma.images.findUnique({
+              where: { id: image.id },
+              select: { name: true },
+            });
+
+            const tempPath = join(
+              __dirname,
+              '..',
+              '..',
+              '..',
+              '..',
+              'uploads',
+              'temp',
+              imagePath.name,
+            );
+
+            const newPath = join(
+              __dirname,
+              '..',
+              '..',
+              '..',
+              '..',
+              'uploads',
+              'permanent',
+              imagePath.name,
+            );
+
+            await move(tempPath, newPath);
+          }
+        });
+      }
+
+      return data;
+    } catch (err) {
+      throw new InternalServerErrorException(err.message);
+    }
   }
 
   async remove(id: string) {
