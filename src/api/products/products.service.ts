@@ -111,6 +111,7 @@ export class ProductsService {
           where: { isMain: true },
           select: { image: { select: { name: true } }, isMain: true },
         },
+        _count: { select: { inCart: true, likedBy: true } },
       },
       skip: (page - 1) * limit,
       take: limit,

@@ -60,9 +60,9 @@ export class CartService {
       },
     });
 
-    if (product.inStock < (cartItemDto?.count || 1))
+    if (product.inStock <= 0)
       throw new BadRequestException(
-        `Mahsulot soni ombordagi miqdordan ortiq! Mavjud: ${product.inStock}`,
+        `Mahsulot sotuvda mavjud emas yoki sotib bo'lindi!`,
       );
 
     const cart = await this.get(userId);
