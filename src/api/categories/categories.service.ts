@@ -76,6 +76,9 @@ export class CategoriesService {
   async findOne(id: string) {
     const data = await this.prismaService.categories.findUnique({
       where: { id },
+      include: {
+        products: true,
+      },
     });
 
     if (!data) throw new NotFoundException('Kategoriya topilmadi!');
@@ -96,6 +99,9 @@ export class CategoriesService {
 
   async remove(id: string) {
     const category = await this.findOne(id);
+
+    if (category.products.length > 0)
+      throw new NotFoundException("Kategoriyani o'chirish imkoni yo'q!");
 
     await this.prismaService.categories.delete({ where: { id: category.id } });
     return 'Kategoriya muvaffaqiyatli o`chirildi!';
