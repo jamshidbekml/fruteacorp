@@ -10,10 +10,10 @@ import {
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
+  IsDateString,
   IsEnum,
   IsNotEmpty,
   IsNumber,
-  IsNumberString,
   IsOptional,
   IsString,
   IsUUID,
@@ -110,7 +110,7 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   })
   @IsOptional()
   @IsNotEmpty()
-  @IsNumberString()
+  @IsDateString()
   discountExpiresAt?: Date;
 
   @ApiProperty({
