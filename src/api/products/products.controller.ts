@@ -50,8 +50,9 @@ export class ProductsController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('search') search?: string,
+    @Query('categoryId') categoryId?: string,
   ) {
-    return this.productsService.findAll(page, limit, search);
+    return this.productsService.findAll(page, limit, search, categoryId);
   }
 
   @Public()

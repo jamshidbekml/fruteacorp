@@ -15,6 +15,7 @@ export class CartService {
       select: {
         orderItems: {
           include: { product: true },
+          orderBy: { createdAt: 'desc' },
         },
         totalAmount: true,
         id: true,
