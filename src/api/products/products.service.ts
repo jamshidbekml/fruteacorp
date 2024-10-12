@@ -30,6 +30,7 @@ export class ProductsService {
             discountAmount: createProductDto?.discountAmount,
             discountStatus: createProductDto?.discountStatus,
             discountExpiresAt: createProductDto?.discountExpiresAt,
+            inStock: createProductDto?.inStock,
           },
         });
 
