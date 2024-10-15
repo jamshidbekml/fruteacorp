@@ -15,6 +15,8 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { UploadModule } from './upload/upload.module';
 import { TasksModule } from './tasks/tasks.module';
 import { PaymeModule } from './payme/payme.module';
+import { SessionModule } from './session/session.module';
+import { SessionGuard } from './auth/guards/session.guard';
 @Module({
   imports: [
     AuthModule,
@@ -29,10 +31,12 @@ import { PaymeModule } from './payme/payme.module';
     UploadModule,
     TasksModule,
     PaymeModule,
+    SessionModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AccessTokenGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_GUARD, useClass: SessionGuard },
     { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
   ],
 })

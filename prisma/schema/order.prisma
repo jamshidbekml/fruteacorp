@@ -1,0 +1,46 @@
+enum ORDER_STATUS {
+    created
+    pending_payment
+    paid
+    cancelled
+    onway
+    delivered
+}
+
+model Orders {
+    id           String         @id @default(uuid()) @db.Uuid
+    userId       String         @db.Uuid
+    user         Users          @relation(fields: [userId], references: [id])
+    totalAmount  Decimal        @default(0) @db.Decimal(10, 2)
+    status       ORDER_STATUS   @default(created)
+    createdAt    DateTime       @default(now())
+    updatedAt    DateTime       @updatedAt
+    orderItems OrderProduct[]
+
+    @@map("orders")
+}
+
+model OrderProduct {
+    id        String   @id @default(uuid())
+    orderId   String @db.Uuid // Order bilan bog'lanadi
+    productId String @db.Uuid // Mahsulot ID
+    quantity  Int      @default(1)
+    price     Decimal
+    Product   Products @relation(fields: [productId], references: [id])
+    Order     Orders   @relation(fields: [orderId], references: [id])
+}
+
+model Transactions {
+    id          String   @id @default(uuid()) @db.Uuid
+    orederId    String   @db.Uuid
+    userId      String   @db.Uuid
+    amount      Int
+    reason      Int
+    state       Int
+    performTime DateTime
+    cancelTime  DateTime
+    createdAt   DateTime
+    updatedAt   DateTime @updatedAt
+
+    @@map("transactions")
+}

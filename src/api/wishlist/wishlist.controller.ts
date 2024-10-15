@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Req } from '@nestjs/common';
 import { WishlistService } from './wishlist.service';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Public } from '../auth/decorators/public.decorator';
 
-@ApiBearerAuth()
+@Public()
 @ApiTags('Wishlist')
 @Controller('wishlist')
 export class WishlistController {
@@ -12,14 +12,16 @@ export class WishlistController {
 
   @ApiOperation({ summary: 'Add or Remove product to wishlist' })
   @Post()
-  create(@Req() req: Request, @Body() createWishlistDto: CreateWishlistDto) {
-    const { sub } = req['user'] as { sub: string };
-    return this.wishlistService.add(createWishlistDto.productId, sub);
+  create(@Req() request, @Body() createWishlistDto: CreateWishlistDto) {
+    const sessionId = request.sessionID;
+    return this.wishlistService.add(createWishlistDto.productId, sessionId);
   }
 
   @Get()
-  findAll(@Req() req: Request) {
-    const { sub } = req['user'] as { sub: string };
-    return this.wishlistService.get(sub);
+  async findAll(@Req() request) {
+    const sessionId = request.sessionID;
+    const { products } = await this.wishlistService.get(sessionId);
+
+    return products;
   }
 }

@@ -1,0 +1,39 @@
+enum ROLE {
+    superadmin
+    operator
+    packman
+    user
+}
+
+model Users {
+    id           String           @id @default(uuid()) @db.Uuid
+    firstName    String
+    lastName     String
+    phone        String           @unique
+    password     String
+    refreshToken String?
+    role         ROLE             @default(user)
+    Orders       Orders[]
+    otps         Otps[]
+    usedPromos   UserPromocodes[]
+    sessions     Session[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("users")
+}
+
+model Session {
+    sid        String   @id @unique
+    sess       Json
+    expire     DateTime // Sessiyaning tugash vaqti
+    userAgent  String? // Brauzer yoki qurilma ma'lumotlari
+    ipAddress  String? // Foydalanuvchining IP manzili
+    deviceType String? // Qurilma turi (masalan, 'desktop', 'mobile')
+    user       Users?   @relation(fields: [userId], references: [id])
+    userId     String?  @db.Uuid // Foydalanuvchi bilan bog'lanish maydoni
+    createdAt  DateTime @default(now())
+
+    @@map("session")
+}

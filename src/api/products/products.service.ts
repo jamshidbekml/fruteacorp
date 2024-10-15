@@ -10,10 +10,14 @@ import { join } from 'path';
 import { move } from 'fs-extra';
 import { deleteFile } from '../shared/utils/deleteFile';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { CartService } from '../cart/cart.service';
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly cartService: CartService,
+  ) {}
 
   async create(createProductDto: CreateProductDto) {
     try {
@@ -159,7 +163,7 @@ export class ProductsService {
 
     if (!product) throw new BadRequestException('Mahsulot topilmadi!');
 
-    return product;
+    return { ...product, isCart: false };
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {

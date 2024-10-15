@@ -1,0 +1,43 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder"]
+}
+
+model Images {
+  id            String          @id @default(uuid()) @db.Uuid
+  name          String
+  size          BigInt
+  ext           String
+  mimetype      String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  productImages ProductImages[]
+
+  @@map("images")
+}
+
+model Otps {
+  id        String   @id @default(uuid())
+  code      String   @default("00000")
+  userId    String   @db.Uuid
+  user      Users    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("otps")
+}
+
+model Settings {
+  id               String  @id @default(uuid()) @db.Uuid
+  deliveryPrice    Int     @default(0)
+  deliveryFreeFrom Int     @default(0)
+  freeDelivery     Boolean @default(false)
+  companyPhone     String
+
+  @@map("settings")
+}

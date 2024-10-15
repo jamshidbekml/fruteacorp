@@ -7,9 +7,7 @@ import {
   Param,
   Patch,
   Delete,
-  // Patch,
-  // Param,
-  // Delete,
+  Req,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -23,7 +21,6 @@ import {
 } from '@nestjs/swagger';
 import { Public } from '../auth/decorators/public.decorator';
 import { UpdateProductDto } from './dto/update-product.dto';
-// import { UpdateProductDto } from './dto/update-product.dto';
 
 @ApiTags('Products')
 @Controller('products')
@@ -47,11 +44,15 @@ export class ProductsController {
   @ApiQuery({ name: 'categoryId', required: false, type: String })
   @Get()
   findAll(
+    @Req() request,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('search') search?: string,
     @Query('categoryId') categoryId?: string,
   ) {
+    console.log(request.sessionID);
+    console.log(request.session);
+
     return this.productsService.findAll(page, limit, search, categoryId);
   }
 
@@ -59,7 +60,7 @@ export class ProductsController {
   @ApiOperation({ summary: 'Get one Product' })
   @ApiParam({ name: 'id' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Req() req, @Param('id') id: string) {
     return this.productsService.findOne(id);
   }
 

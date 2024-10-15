@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 
@@ -6,50 +10,43 @@ import { CreateCartDto } from './dto/create-cart.dto';
 export class CartService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async get(userId: string) {
-    const existCart = await this.prismaService.orders.findFirst({
+  async get(sessionId: string) {
+    const existCart = await this.prismaService.cart.findFirst({
       where: {
-        userId: userId,
-        status: 'created',
+        sessionId: sessionId,
       },
       select: {
-        orderItems: {
-          include: { product: true },
-          orderBy: { createdAt: 'desc' },
+        products: {
+          include: { Product: true },
+          orderBy: { addedAt: 'desc' },
         },
-        totalAmount: true,
         id: true,
       },
     });
-
     if (existCart)
       return {
-        items: existCart.orderItems,
-        totalAmount: existCart.totalAmount,
+        items: existCart.products,
         id: existCart.id,
       };
-
-    const cart = await this.prismaService.orders.create({
+    const cart = await this.prismaService.cart.create({
       data: {
-        userId: userId,
+        sessionId: sessionId,
       },
       select: {
-        orderItems: {
-          include: { product: true },
+        products: {
+          include: { Product: true },
+          orderBy: { addedAt: 'desc' },
         },
-        totalAmount: true,
         id: true,
       },
     });
-
     return {
-      items: cart.orderItems,
-      totalAmount: cart.totalAmount,
+      items: cart.products,
       id: cart.id,
     };
   }
 
-  async addItem(userId: string, cartItemDto: CreateCartDto) {
+  async addItem(cartItemDto: CreateCartDto, sessionId: string) {
     const product = await this.prismaService.products.findUnique({
       where: { id: cartItemDto.productId },
       select: {
@@ -60,167 +57,142 @@ export class CartService {
         inStock: true,
       },
     });
-
     if (product.inStock <= 0)
       throw new BadRequestException(
         `Mahsulot sotuvda mavjud emas yoki sotib bo'lindi!`,
       );
-
-    const cart = await this.get(userId);
-
+    const cart = await this.get(sessionId);
     const existItem = cart.items.find(
       (item) => item.productId === cartItemDto.productId,
     );
-
-    const { cartId, totalAmount } = await this.prismaService.orders
+    const cartId = await this.prismaService.cart
       .findFirst({
         where: {
-          userId: userId,
-          status: 'created',
-        },
-        select: {
-          id: true,
-          totalAmount: true,
-        },
-      })
-      .then((res) => ({ cartId: res.id, totalAmount: res.totalAmount }));
-
-    if (existItem) {
-      const discount =
-        existItem.product.discountStatus === 'active' &&
-        existItem.product.discountExpiresAt > new Date();
-      const price = discount
-        ? Number(existItem.product.amount) -
-          Number(existItem.product.discountAmount)
-        : Number(existItem.product.amount);
-
-      await this.prismaService.cartItem.update({
-        where: { id: existItem.id },
-        data: {
-          price,
-          quantity: { increment: cartItemDto?.count || 1 },
-        },
-      });
-
-      const decrement = Number(existItem.price) * existItem.quantity;
-      const increment = price * (existItem.quantity + (cartItemDto.count || 1));
-      return await this.prismaService.orders
-        .update({
-          where: {
-            id: cartId,
-          },
-          data: {
-            totalAmount: Number(totalAmount) + increment - decrement,
-          },
-          select: {
-            orderItems: { include: { product: true } },
-            totalAmount: true,
-          },
-        })
-        .then((res) => ({
-          items: res.orderItems,
-          totalAmount: res.totalAmount,
-        }));
-    }
-
-    const discount =
-      product.discountStatus === 'active' &&
-      product.discountExpiresAt > new Date();
-    const price = discount
-      ? Number(product.amount) - Number(product.discountAmount)
-      : Number(product.amount);
-
-    await this.prismaService.cartItem.create({
-      data: {
-        userId: userId,
-        orderId: cartId,
-        productId: cartItemDto.productId,
-        price: price,
-        quantity: cartItemDto.count || 1,
-      },
-    });
-
-    return await this.prismaService.orders
-      .update({
-        where: {
-          id: cartId,
-        },
-        data: {
-          totalAmount: {
-            increment: price * (cartItemDto.count || 1),
-          },
-        },
-        select: {
-          orderItems: {
-            include: { product: true },
-          },
-          totalAmount: true,
-        },
-      })
-      .then((res) => ({
-        items: res.orderItems,
-        totalAmount: res.totalAmount,
-      }));
-  }
-
-  async removeItem(userId: string, body: { productId: string; count: number }) {
-    const cart = await this.get(userId);
-
-    if (!cart) throw new Error('Savat topilmadi!');
-
-    const existItem = cart.items.find(
-      (item) => item.productId === body.productId,
-    );
-
-    if (!existItem) throw new Error('Savatda bu mahsulot mavjud emas!');
-
-    const cartId = await this.prismaService.orders
-      .findFirst({
-        where: {
-          userId: userId,
-          status: 'created',
+          sessionId: sessionId,
         },
         select: {
           id: true,
         },
       })
       .then((res) => res.id);
+    if (existItem) {
+      await this.prismaService.cartProduct.update({
+        where: { id: existItem.id },
+        data: {
+          quantity: { increment: cartItemDto?.count || 1 },
+        },
+      });
+
+      return await this.prismaService.cart
+        .findUnique({
+          where: {
+            id: cartId,
+          },
+          select: {
+            products: {
+              include: { Product: true },
+              orderBy: { addedAt: 'desc' },
+            },
+          },
+        })
+        .then((res) => ({
+          id: cartId,
+          items: res.products,
+        }));
+    }
+    await this.prismaService.cartProduct.create({
+      data: {
+        cartId: cartId,
+        productId: cartItemDto.productId,
+        quantity: cartItemDto.count || 1,
+      },
+    });
+
+    return await 'Mahsulot savatga qo`shildi';
+  }
+
+  async removeItem(
+    body: { productId: string; count: number },
+    sessionId: string,
+  ) {
+    const cart = await this.get(sessionId);
+
+    if (!cart) throw new Error('Savat topilmadi!');
+
+    const existItem = cart.items.find(
+      (item) => item.productId === body.productId,
+    );
+    if (!existItem) throw new Error('Savatda bu mahsulot mavjud emas!');
 
     if (existItem.quantity > (body?.count || 1)) {
-      await this.prismaService.cartItem.update({
+      await this.prismaService.cartProduct.update({
         where: { id: existItem.id },
         data: {
           quantity: { decrement: body.count || 1 },
         },
       });
     } else {
-      await this.prismaService.cartItem.delete({
+      await this.prismaService.cartProduct.delete({
         where: { id: existItem.id },
       });
     }
 
-    return await this.prismaService.orders
-      .update({
-        where: {
-          id: cartId,
-        },
-        data: {
-          totalAmount: {
-            decrement:
-              Number(existItem.price) *
-              (existItem.quantity >= body.count || 1
-                ? body.count || 1
-                : existItem.quantity),
-          },
-        },
-        select: {
-          orderItems: { include: { product: true } },
-          totalAmount: true,
-        },
-      })
-      .then((res) => ({
-        items: res.orderItems,
-        totalAmount: res.totalAmount,
-      }));
+    return 'Mahsulot savatdan o`chirildi';
+  }
+
+  async mergeCarts(userId: string, sessionId: string) {
+    try {
+      const sessionCart = await this.prismaService.cart.findFirst({
+        where: { sessionId },
+        include: { products: true },
+      });
+
+      const userCart = await this.prismaService.cart.findFirst({
+        where: { userId },
+        include: { products: true },
+      });
+
+      if (sessionCart && userCart) {
+        await this.prismaService.$transaction(async (prisma) => {
+          const updatedProducts = userCart.products.map((up) => {
+            const sessionProduct = sessionCart.products.find(
+              (sp) => sp.productId === up.productId,
+            );
+
+            if (sessionProduct) {
+              return {
+                ...up,
+                quantity: up.quantity + sessionProduct.quantity,
+              };
+            }
+
+            return up;
+          });
+
+          const newSessionProducts = sessionCart.products.filter(
+            (sp) =>
+              !userCart.products.some((up) => up.productId === sp.productId),
+          );
+
+          const combinedProducts = [...updatedProducts, ...newSessionProducts];
+
+          await prisma.cart.delete({
+            where: { id: sessionCart.id },
+          });
+
+          await prisma.cart.update({
+            where: { id: userCart.id },
+            data: { products: { set: combinedProducts }, sessionId: sessionId },
+          });
+        });
+      } else if (sessionCart) {
+        await this.prismaService.cart.update({
+          where: { id: sessionCart.id },
+          data: { userId },
+        });
+      }
+    } catch (err) {
+      throw new InternalServerErrorException(err.message);
+    }
   }
 }

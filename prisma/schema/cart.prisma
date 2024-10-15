@@ -1,0 +1,21 @@
+model Cart {
+    id        String        @id @default(uuid()) @db.Uuid
+    sessionId String?       @unique // Ro'yxatdan o'tmagan foydalanuvchilar uchun sessiya ID
+    userId    String?       @unique // Ro'yxatdan o'tgan foydalanuvchilar uchun user ID
+    products  CartProduct[]
+    createdAt DateTime      @default(now())
+    updatedAt DateTime      @updatedAt
+}
+
+model CartProduct {
+    id        String   @id @default(uuid()) @db.Uuid
+    cartId    String   @db.Uuid
+    productId String   @db.Uuid
+    quantity  Int
+    Product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+    Cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+    addedAt DateTime @default(now())
+
+    @@map("cart_items")
+}
