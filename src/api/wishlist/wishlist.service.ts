@@ -31,6 +31,16 @@ export class WishlistService {
       },
     });
 
+    if (!wishlist) {
+      return await this.prismaService.wishlist
+        .create({
+          data: { sessionId: sessionId },
+        })
+        .then((res) => {
+          return { id: res.id, products: [] };
+        });
+    }
+
     return { id: wishlist.id, products: wishlist.products };
   }
 
