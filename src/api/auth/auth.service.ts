@@ -40,14 +40,19 @@ export class AuthService {
     await this.cartService.mergeCarts(user.id, sessionId);
     await this.wishlistService.mergeWishlist(user.id, sessionId);
     await this.prismaService.session.deleteMany({ where: { userId: user.id } });
-    await this.prismaService.session.update({
-      where: {
-        sid: sessionId,
-      },
-      data: {
-        userId: user.id,
-      },
-    });
+
+    this.prismaService.session
+      .update({
+        where: {
+          sid: sessionId,
+        },
+        data: {
+          userId: user.id,
+        },
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
     return { tokens, user };
   }
@@ -60,14 +65,18 @@ export class AuthService {
     await this.cartService.mergeCarts(user.id, sessionId);
     await this.wishlistService.mergeWishlist(user.id, sessionId);
     await this.prismaService.session.deleteMany({ where: { userId: user.id } });
-    await this.prismaService.session.update({
-      where: {
-        sid: sessionId,
-      },
-      data: {
-        userId: user.id,
-      },
-    });
+    await this.prismaService.session
+      .update({
+        where: {
+          sid: sessionId,
+        },
+        data: {
+          userId: user.id,
+        },
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
     return { tokens, user };
   }
