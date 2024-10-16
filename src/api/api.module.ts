@@ -17,6 +17,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { PaymeModule } from './payme/payme.module';
 import { SessionModule } from './session/session.module';
 import { SessionGuard } from './auth/guards/session.guard';
+import { PromoModule } from './promo/promo.module';
 @Module({
   imports: [
     AuthModule,
@@ -32,6 +33,7 @@ import { SessionGuard } from './auth/guards/session.guard';
     TasksModule,
     PaymeModule,
     SessionModule,
+    PromoModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AccessTokenGuard },

@@ -1,10 +1,11 @@
 model PromoCodes {
   id         String           @id @default(uuid()) @db.Uuid
-  name       String
-  active     Boolean
-  expiresAt  DateTime
+  title      String
+  promocode  String           @unique
+  active     Boolean          @default(false)
+  expiresAt  DateTime?
   discount   Int
-  activeFrom Int
+  activeFrom Int              @default(0)
   oneOff     Boolean          @default(false)
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
