@@ -57,7 +57,7 @@ async function bootstrap() {
         httpOnly: true,
         // secure: process.env.NODE_ENV === 'production',
         secure: true,
-        sameSite: 'none',
+        sameSite: 'strict',
         // cro
       },
     }),
