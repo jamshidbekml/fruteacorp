@@ -22,7 +22,14 @@ async function bootstrap() {
   });
   const PgSession = connectPgSimple(session);
 
-  app.enableCors({ origin: '*' });
+  app.enableCors({
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'https://fruteacorp.uz',
+    ],
+    credentials: true,
+  });
   app.enableShutdownHooks();
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
