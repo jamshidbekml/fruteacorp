@@ -56,8 +56,8 @@ async function bootstrap() {
         maxAge: 1000 * 60 * 60 * 24 * 365,
         httpOnly: true,
         // secure: process.env.NODE_ENV === 'production',
-        secure: true,
-        sameSite: 'none',
+        secure: false,
+        sameSite: 'lax',
       },
     }),
   );
