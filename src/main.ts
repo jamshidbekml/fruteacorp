@@ -7,6 +7,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as basicAuth from 'express-basic-auth';
 import * as session from 'express-session';
+import * as cookieParser from 'cookie-parser';
 import * as pg from 'pg';
 import * as connectPgSimple from 'connect-pg-simple';
 import bot from './api/bot';
@@ -43,6 +44,8 @@ async function bootstrap() {
       challenge: true,
     }),
   );
+
+  app.use(cookieParser());
 
   app.use(
     session({
