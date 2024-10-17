@@ -13,7 +13,7 @@ export class SessionGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
-    const sessionId = request.sessionID;
+    const sessionId = request.cookies.sessionId;
 
     try {
       if (sessionId) {
