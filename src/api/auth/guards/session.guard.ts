@@ -17,6 +17,8 @@ export class SessionGuard implements CanActivate {
 
     try {
       if (sessionId) {
+        console.log(request.sessionID);
+
         const session = await this.sessionService.getSession(sessionId);
         console.log(session);
 
