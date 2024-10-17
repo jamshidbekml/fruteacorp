@@ -28,6 +28,7 @@ async function bootstrap() {
       'http://localhost:5173',
       'https://fruteacorp.uz',
       'https://fruteacorp-shop.vercel.app',
+      'https://connection-five.vercel.app',
     ],
     credentials: true,
   });
