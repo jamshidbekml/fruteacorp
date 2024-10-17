@@ -50,9 +50,6 @@ export class ProductsController {
     @Query('search') search?: string,
     @Query('categoryId') categoryId?: string,
   ) {
-    console.log(request.sessionID);
-    console.log(request.session);
-
     return this.productsService.findAll(page, limit, search, categoryId);
   }
 

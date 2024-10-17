@@ -17,10 +17,7 @@ export class SessionGuard implements CanActivate {
 
     try {
       if (sessionId) {
-        console.log(sessionId);
-
         const session = await this.sessionService.getSession(sessionId);
-        console.log(session);
 
         if (session && !session.userAgent)
           await this.sessionService.updateSession(sessionId, request);
@@ -47,7 +44,6 @@ export class SessionGuard implements CanActivate {
         return true;
       }
 
-      console.log(sessionId);
       request.session.regenerate((err) => {
         if (err) {
           throw new InternalServerErrorException("Sessiyani yaratib bo'lmadi");

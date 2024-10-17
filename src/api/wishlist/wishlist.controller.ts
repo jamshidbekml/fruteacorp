@@ -13,13 +13,13 @@ export class WishlistController {
   @ApiOperation({ summary: 'Add or Remove product to wishlist' })
   @Post()
   create(@Req() request, @Body() createWishlistDto: CreateWishlistDto) {
-    const sessionId = request.sessionID;
+    const sessionId = request.cookies.sessionID;
     return this.wishlistService.add(createWishlistDto.productId, sessionId);
   }
 
   @Get()
   async findAll(@Req() request) {
-    const sessionId = request.sessionID;
+    const sessionId = request.cookies.sessionID;
     const { products } = await this.wishlistService.get(sessionId);
 
     return products;

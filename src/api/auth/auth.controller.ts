@@ -16,7 +16,7 @@ export class AuthController {
   async create(@Req() request, @Body() createAuthDto: AuthDto) {
     const { tokens, user } = await this.authService.signin(
       createAuthDto,
-      request.sessionID,
+      request.cookies.sessionId,
     );
     request.session.userId = user.id;
     request.session.save();
@@ -28,7 +28,7 @@ export class AuthController {
   async signup(@Req() request, @Body() createAuthDto: SignupDto) {
     const { tokens, user } = await this.authService.signup(
       createAuthDto,
-      request.sessionID,
+      request.cookies.sessionID,
     );
 
     request.session.userId = user.id;
