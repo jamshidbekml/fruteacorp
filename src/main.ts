@@ -30,6 +30,7 @@ async function bootstrap() {
       'https://fruteacorp.uz',
       'https://fruteacorp-shop.vercel.app',
       'https://connection-five.vercel.app',
+      'https://connection-jamshidbekmls-projects.vercel.app',
     ],
     credentials: true,
   });
