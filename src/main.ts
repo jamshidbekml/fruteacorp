@@ -54,7 +54,7 @@ async function bootstrap() {
         pool: pgPool,
         tableName: 'session', // Session ma'lumotlar uchun table nomi
       }),
-      secret: config.get<string>('SESSION_SECRET'),
+      // secret: config.get<string>('SESSION_SECRET'),
       resave: false,
       saveUninitialized: true,
       cookie: {
