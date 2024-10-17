@@ -62,6 +62,26 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   description_uz?: string;
 
   @ApiProperty({
+    description: `Field to enter product's description`,
+    required: false,
+    type: 'string',
+  })
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  extraInfoRu?: string;
+
+  @ApiProperty({
+    description: `Field to enter product's description`,
+    required: false,
+    type: 'string',
+  })
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  extraInfoUz?: string;
+
+  @ApiProperty({
     description: `Field to enter product's price`,
     required: false,
     type: 'number',

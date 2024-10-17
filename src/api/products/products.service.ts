@@ -35,6 +35,8 @@ export class ProductsService {
             discountStatus: createProductDto?.discountStatus,
             discountExpiresAt: createProductDto?.discountExpiresAt,
             inStock: createProductDto?.inStock,
+            extraInfoUz: createProductDto?.extraInfoUz,
+            extraInfoRu: createProductDto?.extraInfoRu,
           },
         });
 
@@ -189,6 +191,8 @@ export class ProductsService {
           title_ru: updateProductDto?.title_ru || product.title_ru,
           title_uz: updateProductDto?.title_uz || product.title_uz,
           categoryId: updateProductDto?.categoryId || product.categoryId,
+          extraInfoRu: updateProductDto?.extraInfoRu || product.extraInfoRu,
+          extraInfoUz: updateProductDto?.extraInfoUz || product.extraInfoUz,
         },
       });
 
