@@ -49,7 +49,7 @@ async function bootstrap() {
       name: 'sessionId',
       store: new PgSession({
         pool: pgPool,
-        tableName: 'session', // Session ma'lumotlar uchun jadval nomi
+        tableName: 'session', // Session ma'lumotlar uchun table nomi
       }),
       secret: config.get<string>('SESSION_SECRET'),
       resave: false,

@@ -12,6 +12,7 @@ export class SessionGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+    const response = context.switchToHttp().getResponse();
     const sessionId = request.sessionID;
 
     try {
@@ -30,8 +31,22 @@ export class SessionGuard implements CanActivate {
             }
           });
 
+          response.cookie('sessionId', request.sessionID, {
+            httpOnly: true,
+            secure: true, // Set to true if your site is using HTTPS
+            sameSite: 'None', // Required for cross-site cookies
+            maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
+          });
+
           return true;
         }
+
+        response.cookie('sessionId', request.sessionID, {
+          httpOnly: true,
+          secure: true, // Set to true if your site is using HTTPS
+          sameSite: 'None', // Required for cross-site cookies
+          maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
+        });
 
         return true;
       }
