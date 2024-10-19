@@ -7,7 +7,7 @@ export class CreateTransactionDto {
     time: number;
     amount: number;
     account: {
-      contract: string;
+      order_id: string;
     };
   };
 }

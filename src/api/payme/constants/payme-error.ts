@@ -8,13 +8,13 @@ export const PaymeError = {
       en: 'Invalid amount',
     },
   },
-  ContractNotFound: {
-    name: 'ContractNotFound',
+  OrderNotFound: {
+    name: 'OrderNotFound',
     code: -31050,
     message: {
-      uz: 'Shartnoma topilmadi.',
-      ru: 'Договор не найден.',
-      en: 'Contract not found.',
+      uz: 'Bunday buyurtma topilmadi.',
+      ru: 'Заказ не найден.',
+      en: 'Order not found.',
     },
   },
   InvalidAccount: {
