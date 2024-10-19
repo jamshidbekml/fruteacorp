@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   HttpCode,
   HttpStatus,
@@ -18,7 +19,7 @@ export class PaymeController {
   @Public()
   @UseGuards(PaymeBasicAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async handleTransactionMethods(reqBody: PaymeRequestBody) {
+  async handleTransactionMethods(@Body() reqBody: PaymeRequestBody) {
     return await this.paymeService.handleTransactionMethods(reqBody);
   }
 }
