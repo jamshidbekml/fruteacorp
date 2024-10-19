@@ -16,7 +16,7 @@ async function bootstrap() {
 
   app.enableCors({ origin: '*' });
   app.enableShutdownHooks();
-  app.setGlobalPrefix('api');
+  // app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   app.use(
