@@ -10,13 +10,22 @@ import {
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
-import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Public } from '../auth/decorators/public.decorator';
 
+@ApiTags('Subscriptions')
 @Controller('subscriptions')
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
 
   @ApiOperation({ summary: 'Create Subscription' })
+  @ApiBearerAuth()
   @ApiBody({
     type: CreateSubscriptionDto,
   })
@@ -25,12 +34,14 @@ export class SubscriptionsController {
     return this.subscriptionsService.create(createSubscriptionDto);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get All Subscriptions' })
   @Get()
   findAll() {
     return this.subscriptionsService.findAll();
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get Subscription' })
   @ApiParam({ name: 'id', type: String })
   @Get(':id')
@@ -38,6 +49,7 @@ export class SubscriptionsController {
     return this.subscriptionsService.findOne(id);
   }
 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update Subscription' })
   @ApiParam({ name: 'id', type: String })
   @Patch(':id')
@@ -48,6 +60,7 @@ export class SubscriptionsController {
     return this.subscriptionsService.update(id, updateSubscriptionDto);
   }
 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete Subscription' })
   @ApiParam({ name: 'id', type: String })
   @Delete(':id')
