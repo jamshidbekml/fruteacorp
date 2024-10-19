@@ -52,15 +52,7 @@ export class PaymeService {
 
     if (!order) {
       return {
-        error: {
-          code: ErrorStatusCodes.TransactionNotAllowed,
-          message: {
-            uz: 'Bunday buyurtma topilmadi',
-            en: 'Order not found',
-            ru: 'Заказ не найден',
-          },
-          data: null,
-        },
+        error: PaymeError.OrderNotFound,
       };
     }
 
@@ -91,7 +83,6 @@ export class PaymeService {
     if (!order) {
       return {
         error: PaymeError.OrderNotFound,
-        id: transId,
       };
     }
 
@@ -105,7 +96,6 @@ export class PaymeService {
       if (transaction.state !== TransactionState.Pending) {
         return {
           error: PaymeError.CantDoOperation,
-          id: transId,
         };
       }
 
@@ -128,7 +118,6 @@ export class PaymeService {
             state: TransactionState.PendingCanceled,
             reason: CancelingReasons.CanceledDueToTimeout,
           },
-          id: transId,
         };
       }
 
@@ -156,7 +145,6 @@ export class PaymeService {
     if (checkResult.error) {
       return {
         error: checkResult.error,
-        id: transId,
       };
     }
 
@@ -189,7 +177,6 @@ export class PaymeService {
     if (!transaction) {
       return {
         error: PaymeError.TransactionNotFound,
-        id: performTransactionDto.params.id,
       };
     }
 
@@ -197,7 +184,6 @@ export class PaymeService {
       if (transaction.state !== 2) {
         return {
           error: PaymeError.CantDoOperation,
-          id: performTransactionDto.params.id,
         };
       }
 
@@ -233,7 +219,6 @@ export class PaymeService {
           reason: CancelingReasons.CanceledDueToTimeout,
           ...PaymeError.CantDoOperation,
         },
-        id: performTransactionDto.params.id,
       };
     }
 
@@ -270,7 +255,6 @@ export class PaymeService {
 
     if (!transaction) {
       return {
-        id: transId,
         error: PaymeError.TransactionNotFound,
       };
     }
@@ -338,7 +322,6 @@ export class PaymeService {
     if (!transaction) {
       return {
         error: PaymeError.TransactionNotFound,
-        id: checkTransactionDto.params.id,
       };
     }
 

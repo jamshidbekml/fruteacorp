@@ -16,6 +16,7 @@ export const PaymeError = {
       ru: 'Заказ не найден.',
       en: 'Order not found.',
     },
+    data: null,
   },
   InvalidAccount: {
     name: 'InvalidAccount',
@@ -25,6 +26,7 @@ export const PaymeError = {
       uz: 'Biz sizning hisobingizni topolmadik.',
       en: "We couldn't find your account",
     },
+    data: null,
   },
   CantDoOperation: {
     name: 'CantDoOperation',
@@ -34,6 +36,7 @@ export const PaymeError = {
       ru: 'Мы не можем сделать операцию',
       en: "We can't do operation",
     },
+    data: null,
   },
   CannotBeReversed: {
     name: 'CannotBeReversed',
