@@ -1,7 +1,6 @@
 model Wishlist {
   id        String            @id @default(uuid()) @db.Uuid // Unique ID for the wishlist
-  userId    String?           @unique // Foreign key to the User model (nullable for non-registered users)
-  sessionId String?           @unique // Session ID for unauthenticated users
+  userId    String            @unique // Foreign key to the User model (nullable for non-registered users)
   products  WishlistProduct[] // Relation to the products in the wishlist
   createdAt DateTime          @default(now()) // Timestamp for when the wishlist was created
   updatedAt DateTime          @updatedAt // Timestamp for when the wishlist was last updated

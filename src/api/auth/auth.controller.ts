@@ -13,28 +13,13 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @SignIn('signin')
-  async create(@Req() request, @Body() createAuthDto: AuthDto) {
-    const { tokens, user } = await this.authService.signin(
-      createAuthDto,
-      request.cookies.sessionId,
-    );
-    request.session.userId = user.id;
-    request.session.save();
-
-    return { ...tokens, role: user.role };
+  create(@Body() createAuthDto: AuthDto) {
+    return this.authService.signin(createAuthDto);
   }
 
   @SignUp('signup')
-  async signup(@Req() request, @Body() createAuthDto: SignupDto) {
-    const { tokens, user } = await this.authService.signup(
-      createAuthDto,
-      request.cookies.sessionID,
-    );
-
-    request.session.userId = user.id;
-    request.session.save();
-
-    return { ...tokens, role: user.role };
+  signup(@Body() createAuthDto: SignupDto) {
+    return this.authService.signup(createAuthDto);
   }
 
   @GetMe('getme')

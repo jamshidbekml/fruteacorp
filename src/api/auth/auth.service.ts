@@ -11,22 +11,16 @@ import { UsersService } from '../users/users.service';
 import { AuthDto, SignupDto } from './dto/auth.dto';
 import { generateRandomNumber } from '../shared/utils/code-generator';
 import { smsSender } from '../shared/utils/sms-sender';
-import { CartService } from '../cart/cart.service';
-import { WishlistService } from '../wishlist/wishlist.service';
-import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
-    private cartService: CartService,
-    private wishlistService: WishlistService,
     private jwtService: JwtService,
     private configService: ConfigService,
-    private readonly prismaService: PrismaService,
   ) {}
 
-  async signin(data: AuthDto, sessionId: string) {
+  async signin(data: AuthDto) {
     const user = await this.userService.findByPhone(data.phone);
     if (!user) throw new BadRequestException('Bunday foydalanuvchi topilmadi!');
 
@@ -37,48 +31,15 @@ export class AuthService {
     const tokens = await this.getTokens(user.id, user.phone, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken.token);
 
-    await this.cartService.mergeCarts(user.id, sessionId);
-    await this.wishlistService.mergeWishlist(user.id, sessionId);
-    await this.prismaService.session.deleteMany({ where: { userId: user.id } });
-
-    this.prismaService.session
-      .update({
-        where: {
-          sid: sessionId,
-        },
-        data: {
-          userId: user.id,
-        },
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    return { tokens, user };
+    return { ...tokens, role: user.role };
   }
 
-  async signup(data: SignupDto, sessionId: string) {
+  async signup(data: SignupDto) {
     const user = await this.userService.create(data);
 
     const tokens = await this.getTokens(user.id, user.phone, user.role);
 
-    await this.cartService.mergeCarts(user.id, sessionId);
-    await this.wishlistService.mergeWishlist(user.id, sessionId);
-    await this.prismaService.session.deleteMany({ where: { userId: user.id } });
-    await this.prismaService.session
-      .update({
-        where: {
-          sid: sessionId,
-        },
-        data: {
-          userId: user.id,
-        },
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    return { tokens, user };
+    return { ...tokens, role: user.role };
   }
 
   async updateRefreshToken(userId: string, refreshToken: string) {

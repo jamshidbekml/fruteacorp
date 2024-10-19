@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { CreateCartDto } from './dto/create-cart.dto';
+import { PrismaService } from 'src/api/prisma/prisma.service';
 
 @Injectable()
 export class CartService {
@@ -19,13 +19,11 @@ export class CartService {
         id: true,
       },
     });
-
     if (existCart)
       return {
         items: existCart.products,
         id: existCart.id,
       };
-
     const cart = await this.prismaService.cart.create({
       data: {
         userId: userId,
@@ -33,37 +31,37 @@ export class CartService {
       select: {
         products: {
           include: { Product: true },
+          orderBy: { addedAt: 'desc' },
         },
         id: true,
       },
     });
-
     return {
       items: cart.products,
       id: cart.id,
     };
   }
 
-  async addItem(userId: string, cartItemDto: CreateCartDto) {
+  async addItem(cartItemDto: CreateCartDto, userId: string) {
     const product = await this.prismaService.products.findUnique({
       where: { id: cartItemDto.productId },
       select: {
+        amount: true,
+        discountAmount: true,
+        discountExpiresAt: true,
+        discountStatus: true,
         inStock: true,
       },
     });
-
     if (product.inStock <= 0)
       throw new BadRequestException(
         `Mahsulot sotuvda mavjud emas yoki sotib bo'lindi!`,
       );
-
     const cart = await this.get(userId);
-
     const existItem = cart.items.find(
       (item) => item.productId === cartItemDto.productId,
     );
-
-    const { cartId } = await this.prismaService.cart
+    const cartId = await this.prismaService.cart
       .findFirst({
         where: {
           userId: userId,
@@ -72,8 +70,7 @@ export class CartService {
           id: true,
         },
       })
-      .then((res) => ({ cartId: res.id }));
-
+      .then((res) => res.id);
     if (existItem) {
       await this.prismaService.cartProduct.update({
         where: { id: existItem.id },
@@ -82,9 +79,23 @@ export class CartService {
         },
       });
 
-      return 'Mahsulot savatga qo`shildi!';
+      return await this.prismaService.cart
+        .findUnique({
+          where: {
+            id: cartId,
+          },
+          select: {
+            products: {
+              include: { Product: true },
+              orderBy: { addedAt: 'desc' },
+            },
+          },
+        })
+        .then((res) => ({
+          id: cartId,
+          items: res.products,
+        }));
     }
-
     await this.prismaService.cartProduct.create({
       data: {
         cartId: cartId,
@@ -93,10 +104,10 @@ export class CartService {
       },
     });
 
-    return 'Mahsulot savatga qo`shildi!';
+    return await 'Mahsulot savatga qo`shildi';
   }
 
-  async removeItem(userId: string, body: { productId: string; count: number }) {
+  async removeItem(body: { productId: string; count: number }, userId: string) {
     const cart = await this.get(userId);
 
     if (!cart) throw new Error('Savat topilmadi!');
@@ -104,7 +115,6 @@ export class CartService {
     const existItem = cart.items.find(
       (item) => item.productId === body.productId,
     );
-
     if (!existItem) throw new Error('Savatda bu mahsulot mavjud emas!');
 
     if (existItem.quantity > (body?.count || 1)) {
@@ -120,6 +130,6 @@ export class CartService {
       });
     }
 
-    return 'Mahsulot savatdan o`chirildi!';
+    return 'Mahsulot savatdan o`chirildi';
   }
 }
