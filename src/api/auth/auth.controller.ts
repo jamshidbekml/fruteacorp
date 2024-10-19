@@ -1,4 +1,11 @@
-import { Controller, Body, Req, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Body,
+  Req,
+  Get,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GetMe, SignIn, SignUp } from './decorators/auth.decorator';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -6,8 +13,10 @@ import { Request } from 'express';
 import { Public } from './decorators/public.decorator';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { AuthDto, SignupDto } from './dto/auth.dto';
+import { TransformInterceptor } from '../interceptors/transform.interceptor';
 
 @ApiTags('auth')
+@UseInterceptors(TransformInterceptor)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

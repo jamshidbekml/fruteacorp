@@ -6,12 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { TransformInterceptor } from '../interceptors/transform.interceptor';
 
 @Controller('orders')
+@UseInterceptors(TransformInterceptor)
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 

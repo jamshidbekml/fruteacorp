@@ -1,11 +1,20 @@
-import { Controller, Get, Post, Body, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Req,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CartService } from './cart.service';
 import { Request } from 'express';
 import { CreateCartDto, RemoveCartDto } from './dto/create-cart.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { TransformInterceptor } from '../interceptors/transform.interceptor';
 
 @ApiBearerAuth()
 @ApiTags('Cart')
+@UseInterceptors(TransformInterceptor)
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}

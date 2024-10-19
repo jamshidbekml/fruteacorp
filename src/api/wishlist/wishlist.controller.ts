@@ -1,12 +1,21 @@
-import { Controller, Get, Post, Body, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Req,
+  UseInterceptors,
+} from '@nestjs/common';
 import { WishlistService } from './wishlist.service';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
+import { TransformInterceptor } from '../interceptors/transform.interceptor';
 
 @ApiBearerAuth()
 @ApiTags('Wishlist')
 @Controller('wishlist')
+@UseInterceptors(TransformInterceptor)
 export class WishlistController {
   constructor(private readonly wishlistService: WishlistService) {}
 

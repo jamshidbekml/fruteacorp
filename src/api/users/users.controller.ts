@@ -7,6 +7,7 @@ import {
   Delete,
   Query,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -24,10 +25,12 @@ import { UserDto } from './dto/user.dto';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Request } from 'express';
 import { NestedSerialize } from '../interceptors/nested-serialize.interceptor';
+import { TransformInterceptor } from '../interceptors/transform.interceptor';
 
 @ApiBearerAuth()
 @ApiTags('Users')
 @Controller('users')
+@UseInterceptors(TransformInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

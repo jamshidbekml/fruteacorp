@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -22,9 +23,11 @@ import {
 import { Roles } from '../auth/decorators/role.decorator';
 import { ROLE } from '@prisma/client';
 import { Public } from '../auth/decorators/public.decorator';
+import { TransformInterceptor } from '../interceptors/transform.interceptor';
 
 @ApiTags('categories')
 @Controller('categories')
+@UseInterceptors(TransformInterceptor)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 

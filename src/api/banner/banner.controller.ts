@@ -26,8 +26,10 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { Public } from '../auth/decorators/public.decorator';
+import { TransformInterceptor } from '../interceptors/transform.interceptor';
 
 @ApiTags('Banner')
+@UseInterceptors(TransformInterceptor)
 @Controller('banner')
 export class BannerController {
   constructor(private readonly bannerService: BannerService) {}

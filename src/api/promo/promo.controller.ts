@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PromoService } from './promo.service';
 import { CreatePromoDto } from './dto/create-promo.dto';
@@ -21,10 +22,12 @@ import {
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/role.decorator';
 import { ROLE } from '@prisma/client';
+import { TransformInterceptor } from '../interceptors/transform.interceptor';
 
 @ApiTags('Promo')
 @ApiBearerAuth()
 @Controller('promo')
+@UseInterceptors(TransformInterceptor)
 export class PromoController {
   constructor(private readonly promoService: PromoService) {}
 
