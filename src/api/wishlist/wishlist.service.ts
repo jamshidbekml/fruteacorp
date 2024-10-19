@@ -65,7 +65,7 @@ export class WishlistService {
 
     await this.prismaService.wishlistProduct.create({
       data: {
-        wishlistId: userId,
+        wishlistId: wishlist.id,
         productId: id,
       },
     });
