@@ -19,6 +19,7 @@ import {
   ApiConsumes,
   ApiOperation,
   ApiParam,
+  ApiTags,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -26,6 +27,7 @@ import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { Public } from '../auth/decorators/public.decorator';
 
+@ApiTags('Banner')
 @Controller('banner')
 export class BannerController {
   constructor(private readonly bannerService: BannerService) {}
