@@ -17,6 +17,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { PaymeModule } from './payme/payme.module';
 import { PromoModule } from './promo/promo.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { BannerModule } from './banner/banner.module';
 @Module({
   imports: [
     AuthModule,
@@ -33,6 +34,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     PaymeModule,
     PromoModule,
     SubscriptionsModule,
+    BannerModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AccessTokenGuard },
