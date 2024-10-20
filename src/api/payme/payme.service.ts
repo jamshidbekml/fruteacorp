@@ -57,7 +57,8 @@ export class PaymeService {
     }
 
     if (
-      Number(order.totalAmount) !== checkPerformTransactionDto.params.amount
+      Number(order.totalAmount) !==
+      checkPerformTransactionDto.params.amount / 100
     ) {
       return {
         error: PaymeError.InvalidAmount,
