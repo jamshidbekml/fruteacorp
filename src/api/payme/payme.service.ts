@@ -43,6 +43,12 @@ export class PaymeService {
   ) {
     const orderId = checkPerformTransactionDto.params?.account?.order_id;
 
+    if (!isUUID(orderId)) {
+      return {
+        error: PaymeError.InvalidAccount,
+      };
+    }
+
     const order = await this.prismaService.orders.findUnique({
       where: {
         id: orderId,
@@ -55,6 +61,12 @@ export class PaymeService {
       };
     }
 
+    if (order.status === 'paid') {
+      return {
+        error: PaymeError.AlreadyDone,
+      };
+    }
+
     if (
       Number(order.totalAmount) !==
       checkPerformTransactionDto.params.amount / 100
@@ -63,6 +75,7 @@ export class PaymeService {
         error: PaymeError.InvalidAmount,
       };
     }
+
     return {
       result: {
         allow: true,
@@ -73,6 +86,12 @@ export class PaymeService {
   async createTransaction(createTransactionDto: CreateTransactionDto) {
     const orderId = createTransactionDto.params?.account?.order_id;
     const transId = createTransactionDto.params?.id;
+
+    if (!isUUID(orderId)) {
+      return {
+        error: PaymeError.InvalidAccount,
+      };
+    }
 
     const order = await this.prismaService.orders.findUnique({
       where: {
@@ -128,6 +147,23 @@ export class PaymeService {
           create_time: new Date(transaction.createdAt).getTime(),
         },
       };
+    }
+
+    const transactionWithOrder =
+      await this.prismaService.transactions.findFirst({
+        where: {
+          orederId: order.id,
+        },
+      });
+
+    if (transactionWithOrder) {
+      if (transactionWithOrder.state === TransactionState.Pending)
+        return {
+          error: PaymeError.Pending,
+        };
+
+      if (transactionWithOrder.state === TransactionState.Paid)
+        return { error: PaymeError.AlreadyDone };
     }
 
     const checkTransaction: CheckPerformTransactionDto = {
@@ -380,4 +416,10 @@ export class PaymeService {
 
     return transactionCreatedAt < timeoutThreshold;
   }
+}
+
+function isUUID(str) {
+  const pattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+  return pattern.test(str);
 }
