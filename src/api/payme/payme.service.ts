@@ -194,6 +194,15 @@ export class PaymeService {
       },
     });
 
+    await this.prismaService.orders.update({
+      where: {
+        id: orderId,
+      },
+      data: {
+        status: 'pending_payment',
+      },
+    });
+
     return {
       result: {
         transaction: newTransaction.id,
@@ -260,7 +269,7 @@ export class PaymeService {
 
     const performTime = new Date();
 
-    const updatedPayment = await this.prismaService.transactions.update({
+    const updatedTransaction = await this.prismaService.transactions.update({
       where: {
         uid: performTransactionDto.params.id,
       },
@@ -271,9 +280,18 @@ export class PaymeService {
       },
     });
 
+    await this.prismaService.orders.update({
+      where: {
+        id: updatedTransaction.orederId,
+      },
+      data: {
+        status: 'paid',
+      },
+    });
+
     return {
       result: {
-        transaction: updatedPayment.id,
+        transaction: updatedTransaction.id,
         perform_time: performTime.getTime(),
         state: TransactionState.Paid,
       },
@@ -336,6 +354,15 @@ export class PaymeService {
         state: TransactionState.PaidCanceled,
         cancelTime: new Date(),
         reason: cancelTransactionDto.params.reason,
+      },
+    });
+
+    await this.prismaService.orders.update({
+      where: {
+        id: updatedTransaction.orederId,
+      },
+      data: {
+        status: 'created',
       },
     });
 
