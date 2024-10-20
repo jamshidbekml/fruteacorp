@@ -50,7 +50,7 @@ export class OrdersService {
         },
       });
 
-      let amount: number;
+      let amount: number = 0;
 
       for (const product of cart.products) {
         amount =
