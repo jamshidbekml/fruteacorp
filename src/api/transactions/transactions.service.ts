@@ -46,6 +46,7 @@ export class TransactionsService {
         cancelTime: true,
         updatedAt: true,
         state: true,
+        uid: true,
       },
       take: limit,
       skip: (page - 1) * limit,
