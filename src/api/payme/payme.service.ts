@@ -3,7 +3,6 @@ import { TransactionMethods } from './constants/transaction-methods';
 import { PaymeRequestBody } from './types/incoming-request-body';
 import { CheckPerformTransactionDto } from './dto/check-perform-transaction.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { ErrorStatusCodes } from './constants/error-status-codes';
 import { PaymeError } from './constants/payme-error';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionState } from './constants/transaction-state';
@@ -134,7 +133,7 @@ export class PaymeService {
     const checkTransaction: CheckPerformTransactionDto = {
       method: TransactionMethods.CheckPerformTransaction,
       params: {
-        amount: Number(order.totalAmount),
+        amount: Number(order.totalAmount) * 100,
         account: {
           order_id: orderId,
         },
