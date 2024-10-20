@@ -1,0 +1,26 @@
+enum ORDER_STATUS {
+    created
+    pending_payment
+    paid
+    cancelled
+    onway
+    delivered
+}
+
+enum TRANSACTION_STATUS {
+    pending
+    paid
+    cancelled
+}
+
+enum ROLE {
+    superadmin
+    operator
+    packman
+    user
+}
+
+enum STATUS {
+    active
+    inactive
+}

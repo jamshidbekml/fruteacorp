@@ -23,6 +23,8 @@ import {
 import { Public } from '../auth/decorators/public.decorator';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
+import { Roles } from '../auth/decorators/role.decorator';
+import { ROLE } from '@prisma/client';
 
 @ApiTags('Products')
 @Controller('products')
@@ -36,6 +38,7 @@ export class ProductsController {
     type: CreateProductDto,
   })
   @Post()
+  @Roles(ROLE.superadmin, ROLE.operator)
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
@@ -47,7 +50,6 @@ export class ProductsController {
   @ApiQuery({ name: 'categoryId', required: false, type: String })
   @Get()
   findAll(
-    @Req() request,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('search') search?: string,
@@ -65,6 +67,7 @@ export class ProductsController {
   }
 
   @ApiBearerAuth()
+  @Roles(ROLE.superadmin, ROLE.operator)
   @ApiOperation({ summary: 'Update Product' })
   @ApiBody({
     type: UpdateProductDto,
@@ -76,6 +79,7 @@ export class ProductsController {
   }
 
   @ApiBearerAuth()
+  @Roles(ROLE.superadmin, ROLE.operator)
   @ApiOperation({ summary: 'Delete Product' })
   @ApiParam({ name: 'id' })
   @Delete(':id')

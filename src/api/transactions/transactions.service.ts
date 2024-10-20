@@ -1,26 +1,87 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TransactionsService {
-  create(createTransactionDto: CreateTransactionDto) {
-    return 'This action adds a new transaction';
-  }
+  constructor(private readonly prismaService: PrismaService) {}
 
-  findAll() {
-    return `This action returns all transactions`;
-  }
+  async findAll(page: number, limit: number, search?: string) {
+    const data = await this.prismaService.transactions.findMany({
+      where: {
+        ...(search
+          ? {
+              OR: [
+                {
+                  order: {
+                    User: {
+                      firstName: { contains: search, mode: 'insensitive' },
+                    },
+                  },
+                },
+                {
+                  order: {
+                    User: {
+                      lastName: { contains: search, mode: 'insensitive' },
+                    },
+                  },
+                },
+                {
+                  order: {
+                    User: {
+                      phone: { contains: search, mode: 'insensitive' },
+                    },
+                  },
+                },
+              ],
+            }
+          : {}),
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        createdAt: true,
+        amount: true,
+        status: true,
+        performTime: true,
+        cancelTime: true,
+        updatedAt: true,
+      },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
-  }
+    const total = await this.prismaService.transactions.count({
+      where: {
+        ...(search
+          ? {
+              OR: [
+                {
+                  order: {
+                    User: {
+                      firstName: { contains: search, mode: 'insensitive' },
+                    },
+                  },
+                },
+                {
+                  order: {
+                    User: {
+                      lastName: { contains: search, mode: 'insensitive' },
+                    },
+                  },
+                },
+                {
+                  order: {
+                    User: {
+                      phone: { contains: search, mode: 'insensitive' },
+                    },
+                  },
+                },
+              ],
+            }
+          : {}),
+      },
+    });
 
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
+    return { data, pageSize: limit, current: page, total };
   }
 }

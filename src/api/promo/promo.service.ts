@@ -7,6 +7,7 @@ import {
 import { CreatePromoDto } from './dto/create-promo.dto';
 import { UpdatePromoDto } from './dto/update-promo.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { ValidatePromoDto } from './dto/valitade-promo.dto';
 
 @Injectable()
 export class PromoService {
@@ -93,5 +94,34 @@ export class PromoService {
     await this.prismaService.promoCodes.delete({ where: { id: promo.id } });
 
     return 'Promokod muvaffaqiyatli o`chirildi!';
+  }
+
+  async validate(body: ValidatePromoDto, userId: string) {
+    const promo = await this.prismaService.promoCodes.findUnique({
+      where: { promocode: body.promocode.toUpperCase() },
+    });
+
+    const currentDate = new Date();
+    if (!promo || !promo.active || promo.expiresAt < currentDate)
+      throw new BadRequestException('Bunday promokod mavjud emas!');
+
+    if (promo.activeFrom && body.amount < promo.activeFrom)
+      throw new BadRequestException(
+        `Promokod ${promo.activeFrom} so'm dan boshlab amal qiladi!`,
+      );
+
+    if (promo.oneOff) {
+      const userPromocodes = await this.prismaService.userPromocodes.findFirst({
+        where: {
+          userId,
+          promocodeId: promo.id,
+        },
+      });
+
+      if (userPromocodes)
+        throw new BadRequestException('Bu promokoddan avval foydalangansiz!');
+    }
+
+    return { available: true };
   }
 }

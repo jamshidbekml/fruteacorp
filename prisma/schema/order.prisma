@@ -1,55 +1,33 @@
-enum ORDER_STATUS {
-    created
-    pending_payment
-    paid
-    cancelled
-    onway
-    delivered
-}
-
-enum TRANSACTION_STATUS {
-    pending
-    paid
-    cancelled
-}
-
 model Orders {
-    id           String         @id @default(uuid()) @db.Uuid
-    userId       String?        @db.Uuid
-    user         Users?         @relation(fields: [userId], references: [id], onDelete: SetNull)
-    totalAmount  Decimal        @default(0) @db.Decimal(10, 2)
-    status       ORDER_STATUS   @default(created)
-    createdAt    DateTime       @default(now())
-    updatedAt    DateTime       @updatedAt
-    orderItems   OrderProduct[]
-    Transactions Transactions[]
+    id             String         @id @default(uuid()) @db.Uuid
+    userId         String?        @db.Uuid
+    totalAmount    Decimal        @default(0) @db.Decimal(10, 2)
+    discountAmount Decimal        @default(0) @db.Decimal(10, 2)
+    amount         Decimal        @default(0) @db.Decimal(10, 2)
+    status         ORDER_STATUS   @default(created)
+    addressId      String?        @db.Uuid
+    deliveryInfo   String?
+    extraInfo      String?
+    createdAt      DateTime       @default(now())
+    updatedAt      DateTime       @updatedAt
+    User           Users?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+    Address        Address?       @relation(fields: [addressId], references: [id], onDelete: SetNull)
+    items          OrderProduct[]
+    Transaction    Transactions[]
 
     @@map("orders")
 }
 
 model OrderProduct {
-    id        String   @id @default(uuid())
-    orderId   String   @db.Uuid // Order bilan bog'lanadi
-    productId String   @db.Uuid // Mahsulot ID
-    quantity  Int      @default(1)
-    price     Decimal
-    Product   Products @relation(fields: [productId], references: [id])
-    Order     Orders   @relation(fields: [orderId], references: [id])
-}
+    id        String    @id @default(uuid())
+    orderId   String    @db.Uuid
+    productId String?   @db.Uuid
+    title_uz  String
+    title_ru  String
+    quantity  Int       @default(1)
+    amount    Decimal   @db.Decimal(10, 2)
+    Product   Products? @relation(fields: [productId], references: [id], onDelete: SetNull)
+    Order     Orders    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-model Transactions {
-    id          String             @id @default(uuid()) @db.Uuid
-    uid         String             @unique
-    orederId    String?            @db.Uuid
-    amount      Int
-    reason      Int?
-    state       Int
-    status      TRANSACTION_STATUS
-    performTime DateTime?
-    cancelTime  DateTime?
-    createdAt   DateTime           @default(now())
-    updatedAt   DateTime           @updatedAt
-    order       Orders?            @relation(fields: [orederId], references: [id], onDelete: SetNull)
-
-    @@map("transactions")
+    @@map("order_products")
 }

@@ -1,0 +1,16 @@
+model Transactions {
+    id          String             @id @default(uuid()) @db.Uuid
+    uid         String             @unique
+    orederId    String?            @db.Uuid
+    amount      Int
+    reason      Int?
+    state       Int
+    status      TRANSACTION_STATUS
+    performTime DateTime?
+    cancelTime  DateTime?
+    createdAt   DateTime           @default(now())
+    updatedAt   DateTime           @updatedAt
+    order       Orders?            @relation(fields: [orederId], references: [id], onDelete: SetNull)
+
+    @@map("transactions")
+}

@@ -17,6 +17,7 @@ import { PaymeModule } from './payme/payme.module';
 import { PromoModule } from './promo/promo.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { BannerModule } from './banner/banner.module';
+import { AddressModule } from './address/address.module';
 @Module({
   imports: [
     AuthModule,
@@ -34,6 +35,7 @@ import { BannerModule } from './banner/banner.module';
     PromoModule,
     SubscriptionsModule,
     BannerModule,
+    AddressModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AccessTokenGuard },

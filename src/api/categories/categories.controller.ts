@@ -33,7 +33,7 @@ export class CategoriesController {
 
   @Post()
   @ApiBearerAuth()
-  @Roles(ROLE.superadmin)
+  @Roles(ROLE.superadmin, ROLE.operator)
   @ApiOperation({ summary: 'Create category' })
   @ApiBody({
     schema: {
@@ -83,7 +83,7 @@ export class CategoriesController {
   }
 
   @Patch(':id')
-  @Roles(ROLE.superadmin)
+  @Roles(ROLE.superadmin, ROLE.operator)
   @ApiOperation({ summary: 'Update category' })
   @ApiBody({
     schema: {
@@ -116,7 +116,7 @@ export class CategoriesController {
 
   @Delete(':id')
   @ApiBearerAuth()
-  @Roles(ROLE.superadmin)
+  @Roles(ROLE.superadmin, ROLE.operator)
   @ApiOperation({ summary: 'Delete category' })
   @ApiParam({ name: 'id', type: 'string' })
   remove(@Param('id') id: string) {

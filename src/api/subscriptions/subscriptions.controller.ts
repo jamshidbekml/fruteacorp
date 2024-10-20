@@ -20,6 +20,8 @@ import {
 } from '@nestjs/swagger';
 import { Public } from '../auth/decorators/public.decorator';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
+import { Roles } from '../auth/decorators/role.decorator';
+import { ROLE } from '@prisma/client';
 
 @ApiTags('Subscriptions')
 @Controller('subscriptions')
@@ -33,6 +35,7 @@ export class SubscriptionsController {
     type: CreateSubscriptionDto,
   })
   @Post()
+  @Roles(ROLE.superadmin)
   create(@Body() createSubscriptionDto: CreateSubscriptionDto) {
     return this.subscriptionsService.create(createSubscriptionDto);
   }
@@ -55,6 +58,7 @@ export class SubscriptionsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update Subscription' })
   @ApiParam({ name: 'id', type: String })
+  @Roles(ROLE.superadmin)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -64,6 +68,7 @@ export class SubscriptionsController {
   }
 
   @ApiBearerAuth()
+  @Roles(ROLE.superadmin, ROLE.operator)
   @ApiOperation({ summary: 'Delete Subscription' })
   @ApiParam({ name: 'id', type: String })
   @Delete(':id')

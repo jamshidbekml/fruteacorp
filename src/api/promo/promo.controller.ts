@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseInterceptors,
+  Req,
 } from '@nestjs/common';
 import { PromoService } from './promo.service';
 import { CreatePromoDto } from './dto/create-promo.dto';
@@ -23,6 +24,7 @@ import {
 import { Roles } from '../auth/decorators/role.decorator';
 import { ROLE } from '@prisma/client';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
+import { ValidatePromoDto } from './dto/valitade-promo.dto';
 
 @ApiTags('Promo')
 @ApiBearerAuth()
@@ -51,6 +53,15 @@ export class PromoController {
     @Query('search') search?: string,
   ) {
     return this.promoService.findAll(page, limit, search);
+  }
+
+  @Post('validate')
+  @ApiOperation({ summary: 'Validate promo' })
+  @ApiBody({ type: ValidatePromoDto })
+  validate(@Req() req: Request, @Body() body: ValidatePromoDto) {
+    const user = req['user'] as { sub: string };
+
+    return this.promoService.validate(body, user.sub);
   }
 
   @Get(':id')

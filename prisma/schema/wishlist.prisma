@@ -4,6 +4,8 @@ model Wishlist {
   products  WishlistProduct[] // Relation to the products in the wishlist
   createdAt DateTime          @default(now()) // Timestamp for when the wishlist was created
   updatedAt DateTime          @updatedAt // Timestamp for when the wishlist was last updated
+
+  @@map("wishlist")
 }
 
 model WishlistProduct {
@@ -15,4 +17,6 @@ model WishlistProduct {
   // Relations
   wishlist Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
   Product  Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("wishlist_products")
 }

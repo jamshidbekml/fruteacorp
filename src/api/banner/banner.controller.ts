@@ -27,8 +27,11 @@ import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { Public } from '../auth/decorators/public.decorator';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
+import { Roles } from '../auth/decorators/role.decorator';
+import { ROLE } from '@prisma/client';
 
 @ApiTags('Banner')
+@Roles(ROLE.superadmin, ROLE.operator)
 @UseInterceptors(TransformInterceptor)
 @Controller('banner')
 export class BannerController {

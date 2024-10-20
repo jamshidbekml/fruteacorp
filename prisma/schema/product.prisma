@@ -1,8 +1,3 @@
-enum STATUS {
-    active
-    inactive
-}
-
 model Products {
     id                String            @id @default(uuid()) @db.Uuid
     title_uz          String
