@@ -1,5 +1,6 @@
 model Banner {
-    id        String   @id  @default(uuid()) @db.Uuid
+    id        String   @id @default(uuid()) @db.Uuid
+    title     String
     image     String
     link      String
     createdAt DateTime @default(now())

@@ -61,6 +61,10 @@ export class BannerController {
           type: 'string',
           example: 'https://google.com',
         },
+        title: {
+          type: 'string',
+          example: 'title',
+        },
         image: {
           type: 'file',
           format: 'binary',
@@ -108,6 +112,10 @@ export class BannerController {
         link: {
           type: 'string',
           example: 'https://google.com',
+        },
+        title: {
+          type: 'string',
+          example: 'title',
         },
         image: {
           type: 'file',

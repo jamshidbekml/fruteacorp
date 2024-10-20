@@ -7,4 +7,9 @@ export class UpdateBannerDto extends PartialType(CreateBannerDto) {
   @IsNotEmpty()
   @IsString()
   link?: string;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  title?: string;
 }

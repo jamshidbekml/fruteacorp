@@ -14,7 +14,9 @@ export class SubscriptionsService {
   }
 
   async findAll() {
-    return await this.prismaService.subscription.findMany();
+    return await this.prismaService.subscription.findMany({
+      orderBy: { duration: 'asc' },
+    });
   }
 
   async findOne(id: string) {

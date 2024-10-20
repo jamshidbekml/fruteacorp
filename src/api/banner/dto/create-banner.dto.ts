@@ -6,4 +6,9 @@ export class CreateBannerDto implements Partial<Banner> {
   @IsNotEmpty()
   @IsString()
   link: string;
+
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
+  title: string;
 }
