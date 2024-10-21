@@ -6,10 +6,10 @@ model Users {
     password      String
     refreshToken  String?
     role          ROLE                @default(user)
-    Orders        Orders[]
+    orders        Orders[]
     otps          Otps[]
     promocodes    UserPromocodes[]
-    subscriptions UserSubscriptions[]
+    subscriptions UserSubscription[]
     addresses     Address[]
 
     createdAt DateTime @default(now())

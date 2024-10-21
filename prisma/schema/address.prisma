@@ -1,6 +1,6 @@
 model Address {
-    id             String  @id @default(uuid()) @db.Uuid
-    userId         String  @db.Uuid
+    id             String   @id @default(uuid()) @db.Uuid
+    userId         String   @db.Uuid
     streetName     String
     lat            String
     long           String
@@ -8,6 +8,7 @@ model Address {
     houseLine      String?
     houseNumber    String?
     houseStage     String?
+    createdAt      DateTime @default(now())
 
     User   Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
     orders Orders[]

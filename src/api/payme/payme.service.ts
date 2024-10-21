@@ -280,7 +280,7 @@ export class PaymeService {
       },
     });
 
-    await this.prismaService.orders.update({
+    const order = await this.prismaService.orders.update({
       where: {
         id: updatedTransaction.orederId,
       },
@@ -288,6 +288,33 @@ export class PaymeService {
         status: 'paid',
       },
     });
+
+    if (order.type === 'subscription') {
+      const subscription = await this.prismaService.subscription.findUnique({
+        where: {
+          id: order.subscriptionId,
+        },
+      });
+
+      await this.prismaService.userSubscription.updateMany({
+        where: {
+          userId: order.userId,
+        },
+        data: { active: false, expired: true },
+      });
+
+      await this.prismaService.userSubscription.create({
+        data: {
+          userId: order.userId,
+          subscriptionId: subscription.id,
+          active: true,
+          discount: subscription.discount,
+          expiresAt: new Date(
+            new Date().setMonth(new Date().getMonth() + subscription.duration),
+          ),
+        },
+      });
+    }
 
     return {
       result: {
@@ -323,6 +350,15 @@ export class PaymeService {
           state: TransactionState.PendingCanceled,
           cancelTime: new Date(),
           reason: cancelTransactionDto.params.reason,
+        },
+      });
+
+      await this.prismaService.orders.update({
+        where: {
+          id: cancelTransaction.orederId,
+        },
+        data: {
+          status: 'cancelled',
         },
       });
 
@@ -362,7 +398,7 @@ export class PaymeService {
         id: updatedTransaction.orederId,
       },
       data: {
-        status: 'created',
+        status: 'cancelled',
       },
     });
 

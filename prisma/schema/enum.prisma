@@ -24,3 +24,8 @@ enum STATUS {
     active
     inactive
 }
+
+enum ORDER_TYPE {
+    product
+    subscription
+}

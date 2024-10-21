@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseInterceptors,
+  Req,
 } from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
@@ -53,6 +54,15 @@ export class SubscriptionsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.subscriptionsService.findOne(id);
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Purchase Subscription' })
+  @ApiParam({ name: 'id', type: String })
+  @Post('purchase/:id')
+  purchase(@Req() req: Request, @Param('id') id: string) {
+    const user = req['user'] as { sub: string };
+    return this.subscriptionsService.purchase(id, user.sub);
   }
 
   @ApiBearerAuth()

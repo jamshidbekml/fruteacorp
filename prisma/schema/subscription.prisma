@@ -1,22 +1,27 @@
 model Subscription {
-    id                String              @id @default(uuid()) @db.Uuid
+    id                String             @id @default(uuid()) @db.Uuid
     title             String
-    price             Decimal             @db.Decimal(10, 2)
+    price             Decimal            @db.Decimal(10, 2)
     duration          Int
     description       String
     discount          Int
-    UserSubscriptions UserSubscriptions[]
+    UserSubscriptions UserSubscription[]
 
     @@map("subscriptions")
 }
 
-model UserSubscriptions {
+model UserSubscription {
     id             String       @id @default(uuid()) @db.Uuid
     subscriptionId String       @db.Uuid
-    Subscription   Subscription @relation(fields: [subscriptionId], references: [id])
     userId         String       @db.Uuid
-    User           Users        @relation(fields: [userId], references: [id])
     active         Boolean
+    discount       Int
+    expired        Boolean      @default(false)
+    expiresAt      DateTime
+    createdAt      DateTime     @default(now())
+    updatedAt      DateTime     @updatedAt
+    User           Users        @relation(fields: [userId], references: [id])
+    Subscription   Subscription @relation(fields: [subscriptionId], references: [id])
 
     @@map("user_subscriptions")
 }

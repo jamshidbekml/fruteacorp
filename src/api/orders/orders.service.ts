@@ -40,7 +40,7 @@ export class OrdersService {
       : { discount: 0 };
 
     return await this.prismaService.$transaction(async (prisma) => {
-      const subscription = await prisma.userSubscriptions.findFirst({
+      const subscription = await prisma.userSubscription.findFirst({
         where: {
           userId,
           active: true,
@@ -48,6 +48,7 @@ export class OrdersService {
         include: {
           Subscription: true,
         },
+        orderBy: { createdAt: 'desc' },
       });
 
       let amount: number = 0;

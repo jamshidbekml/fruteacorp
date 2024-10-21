@@ -5,9 +5,11 @@ model Orders {
     discountAmount Decimal        @default(0) @db.Decimal(10, 2)
     amount         Decimal        @default(0) @db.Decimal(10, 2)
     status         ORDER_STATUS   @default(created)
+    type           ORDER_TYPE     @default(product)
     addressId      String?        @db.Uuid
     deliveryInfo   String?
     extraInfo      String?
+    subscriptionId String?        @db.Uuid
     createdAt      DateTime       @default(now())
     updatedAt      DateTime       @updatedAt
     User           Users?         @relation(fields: [userId], references: [id], onDelete: SetNull)

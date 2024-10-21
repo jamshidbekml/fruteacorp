@@ -37,6 +37,21 @@ export class UsersService {
   async findByid(id: string) {
     const user = await this.prismaService.users.findUnique({
       where: { id },
+      include: {
+        orders: {
+          include: {
+            items: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+        subscriptions: {
+          include: {
+            Subscription: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+        addresses: { orderBy: { createdAt: 'desc' } },
+      },
     });
 
     if (!user) throw new NotFoundException('Foydalanuvchi topilmadi!');

@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { generatePaymeUrl } from '../shared/utils/payme-url-generator';
 
 @Injectable()
 export class SubscriptionsService {
@@ -44,5 +45,25 @@ export class SubscriptionsService {
     return await this.prismaService.subscription.delete({
       where: { id: data.id },
     });
+  }
+
+  async purchase(id: string, userId: string) {
+    const subscription = await this.findOne(id);
+
+    const order = await this.prismaService.orders.create({
+      data: {
+        userId,
+        totalAmount: subscription.price,
+        discountAmount: 0,
+        amount: subscription.price,
+        type: 'subscription',
+        subscriptionId: subscription.id,
+      },
+    });
+
+    return {
+      order,
+      paymeUrl: generatePaymeUrl(order.id, Number(order.amount) * 100),
+    };
   }
 }

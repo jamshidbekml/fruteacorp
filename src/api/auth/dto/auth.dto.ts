@@ -69,4 +69,13 @@ export class GetMeDto {
 
   @Expose()
   updatedAt: Date;
+
+  @Expose()
+  orders: any[];
+
+  @Expose()
+  addresses: any[];
+
+  @Expose()
+  subscriptions: any[];
 }
