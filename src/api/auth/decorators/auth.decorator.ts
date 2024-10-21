@@ -62,7 +62,7 @@ export function SignUp(routeName: string) {
 
 export function GetMe(routeName?: string) {
   return applyDecorators(
-    Serialize(GetMeDto),
+    // Serialize(GetMeDto),
     ApiBearerAuth(),
     ApiOperation({ summary: 'Get Me' }),
     Get(routeName),

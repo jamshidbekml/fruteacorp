@@ -133,6 +133,11 @@ export class AuthService {
   }
 
   async getMe(id: string) {
-    return await this.userService.findByid(id);
+    const user = await this.userService.findByid(id);
+
+    delete user.refreshToken;
+    delete user.password;
+
+    return user;
   }
 }
