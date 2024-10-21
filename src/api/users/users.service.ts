@@ -54,6 +54,8 @@ export class UsersService {
       },
     });
 
+    console.log(user);
+
     if (!user) throw new NotFoundException('Foydalanuvchi topilmadi!');
 
     return user;
