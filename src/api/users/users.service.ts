@@ -39,22 +39,31 @@ export class UsersService {
       where: { id },
       include: {
         orders: {
-          include: {
-            items: true,
+          select: {
+            items: {
+              select: {
+                amount: true,
+                quantity: true,
+                title_ru: true,
+              },
+            },
+            createdAt: true,
+            deliveryInfo: true,
+            type: true,
+            status: true,
+            amount: true,
+            discountAmount: true,
+            totalAmount: true,
+            id: true,
           },
           orderBy: { createdAt: 'desc' },
         },
         subscriptions: {
-          include: {
-            Subscription: true,
-          },
           orderBy: { createdAt: 'desc' },
         },
         addresses: { orderBy: { createdAt: 'desc' } },
       },
     });
-
-    console.log(user);
 
     if (!user) throw new NotFoundException('Foydalanuvchi topilmadi!');
 

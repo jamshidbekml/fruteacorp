@@ -158,6 +158,7 @@ export class OrdersService {
           },
         },
         totalAmount: true,
+        type: true,
       },
       skip: (page - 1) * limit,
       take: limit,
