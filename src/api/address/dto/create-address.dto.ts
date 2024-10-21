@@ -13,6 +13,24 @@ export class CreateAddressDto implements Partial<Address> {
   streetName: string;
 
   @ApiProperty({
+    description: 'latitude',
+    required: true,
+  })
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
+  lat: string;
+
+  @ApiProperty({
+    description: 'longitude',
+    required: true,
+  })
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
+  long: string;
+
+  @ApiProperty({
     description: 'House entry code',
     required: false,
   })

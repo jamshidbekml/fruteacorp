@@ -122,6 +122,6 @@ export class PromoService {
         throw new BadRequestException('Bu promokoddan avval foydalangansiz!');
     }
 
-    return { available: true };
+    return { available: true, promo };
   }
 }

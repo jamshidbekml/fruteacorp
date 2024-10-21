@@ -2,12 +2,14 @@ model Address {
     id             String  @id @default(uuid()) @db.Uuid
     userId         String  @db.Uuid
     streetName     String
+    lat            String
+    long           String
     houseEntryCode String?
     houseLine      String?
     houseNumber    String?
     houseStage     String?
 
-    User Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+    User   Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
     orders Orders[]
 
     @@map("address")

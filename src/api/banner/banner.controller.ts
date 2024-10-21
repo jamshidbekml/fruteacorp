@@ -31,7 +31,6 @@ import { Roles } from '../auth/decorators/role.decorator';
 import { ROLE } from '@prisma/client';
 
 @ApiTags('Banner')
-@Roles(ROLE.superadmin, ROLE.operator)
 @UseInterceptors(TransformInterceptor)
 @Controller('banner')
 export class BannerController {
@@ -39,6 +38,7 @@ export class BannerController {
 
   @Post()
   @ApiBearerAuth()
+  @Roles(ROLE.superadmin, ROLE.operator)
   @ApiOperation({ summary: 'Create Banner' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
@@ -91,6 +91,7 @@ export class BannerController {
 
   @Patch(':id')
   @ApiBearerAuth()
+  @Roles(ROLE.superadmin, ROLE.operator)
   @ApiOperation({ summary: 'Update Banner' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
@@ -135,6 +136,7 @@ export class BannerController {
 
   @Delete(':id')
   @ApiBearerAuth()
+  @Roles(ROLE.superadmin, ROLE.operator)
   @ApiOperation({ summary: 'Delete Banner' })
   @ApiParam({ name: 'id', type: 'string' })
   remove(@Param('id') id: string) {

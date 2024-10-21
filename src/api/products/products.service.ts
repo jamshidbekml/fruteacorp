@@ -186,12 +186,6 @@ export class ProductsService {
     if (updateProductDto.images) {
       const imageIds = updateProductDto.images.map((image) => image.id);
 
-      for await (const dir of product.images) {
-        if (!imageIds.includes(dir.image.id)) {
-          deleteFile('premanent', dir.image.name);
-        }
-      }
-
       await this.prismaService.$transaction(async (prisma) => {
         for await (const image of updateProductDto.images) {
           const imageExists = await prisma.productImages.findUnique({
@@ -238,6 +232,16 @@ export class ProductsService {
           await move(tempPath, newPath);
         }
       });
+
+      for await (const dir of product.images) {
+        if (!imageIds.includes(dir.image.id)) {
+          deleteFile('premanent', dir.image.name);
+
+          await this.prismaService.productImages.delete({
+            where: { imageId: dir.image.id },
+          });
+        }
+      }
     }
 
     return data;
