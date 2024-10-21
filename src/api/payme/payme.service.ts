@@ -314,6 +314,12 @@ export class PaymeService {
           ),
         },
       });
+    } else {
+      await this.prismaService.cart.deleteMany({
+        where: {
+          userId: order.userId,
+        },
+      });
     }
 
     return {
@@ -353,7 +359,7 @@ export class PaymeService {
         },
       });
 
-      await this.prismaService.orders.update({
+      const order = await this.prismaService.orders.update({
         where: {
           id: cancelTransaction.orederId,
         },
@@ -361,6 +367,17 @@ export class PaymeService {
           status: 'cancelled',
         },
       });
+
+      // if (order.type === 'subscription') {
+      //   const userSubscription =
+      //     await this.prismaService.userSubscription.findFirst({
+      //       where: {
+      //         userId: order.userId,
+      //         subscriptionId: order.subscriptionId,
+      //       },
+      //       orderBy
+      //     });
+      // }
 
       return {
         result: {

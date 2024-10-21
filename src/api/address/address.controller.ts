@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AddressService } from './address.service';
 import { CreateAddressDto } from './dto/create-address.dto';
@@ -16,10 +17,12 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import { TransformInterceptor } from '../interceptors/transform.interceptor';
 
 @ApiBearerAuth()
 @ApiTags('Address')
 @Controller('address')
+@UseInterceptors(TransformInterceptor)
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
