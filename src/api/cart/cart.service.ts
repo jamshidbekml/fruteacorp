@@ -13,7 +13,18 @@ export class CartService {
       },
       select: {
         products: {
-          include: { Product: true },
+          include: {
+            Product: {
+              include: {
+                images: {
+                  where: { isMain: true },
+                  select: {
+                    image: { select: { name: true, id: true } },
+                  },
+                },
+              },
+            },
+          },
           orderBy: { addedAt: 'desc' },
         },
         id: true,

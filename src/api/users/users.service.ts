@@ -47,6 +47,7 @@ export class UsersService {
                 title_ru: true,
               },
             },
+            Address: true,
             createdAt: true,
             deliveryInfo: true,
             type: true,
