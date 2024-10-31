@@ -4,8 +4,8 @@ import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ApiModule } from './api/api.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { BotModule } from './bot/bot.module';
-import { BotService } from './bot/bot.service';
+// import { BotModule } from './bot/bot.module';
+// import { BotService } from './bot/bot.service';
 
 @Module({
   imports: [
@@ -20,13 +20,13 @@ import { BotService } from './bot/bot.service';
       serveRoot: '/temp/images',
     }),
     ApiModule,
-    BotModule,
+    // BotModule,
   ],
 })
 export class AppModule implements OnApplicationBootstrap {
-  constructor(private readonly bot: BotService) {}
+  // constructor(private readonly bot: BotService) {}
 
   async onApplicationBootstrap() {
-    await this.bot.launch();
+    // await this.bot.launch();
   }
 }
