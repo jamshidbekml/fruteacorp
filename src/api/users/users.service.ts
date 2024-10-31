@@ -47,7 +47,11 @@ export class UsersService {
                 title_ru: true,
               },
             },
-            Address: true,
+            Address: {
+              include: {
+                deliveryArea: true,
+              },
+            },
             createdAt: true,
             deliveryInfo: true,
             type: true,

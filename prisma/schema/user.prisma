@@ -10,7 +10,7 @@ model Users {
     otps          Otps[]
     promocodes    UserPromocodes[]
     subscriptions UserSubscription[]
-    addresses     Address[]
+    addresses     UserAddress[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

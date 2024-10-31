@@ -29,3 +29,8 @@ enum ORDER_TYPE {
     product
     subscription
 }
+
+enum PAYMENT_TYPE {
+    payme
+    click
+}

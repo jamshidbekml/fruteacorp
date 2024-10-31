@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Address, Orders, UserSubscription } from '@prisma/client';
+import { Orders, UserAddress, UserSubscription } from '@prisma/client';
 import { Expose } from 'class-transformer';
 import { IsDefined, IsNotEmpty, IsString } from 'class-validator';
 
@@ -75,7 +75,7 @@ export class GetMeDto {
   orders: Orders[];
 
   @Expose()
-  addresses: Address[];
+  addresses: UserAddress[];
 
   @Expose()
   subscriptions: UserSubscription[];

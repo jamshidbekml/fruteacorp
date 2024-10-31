@@ -6,6 +6,7 @@ model Transactions {
     reason      Int?
     state       Int
     status      TRANSACTION_STATUS
+    type        PAYMENT_TYPE
     performTime DateTime?
     cancelTime  DateTime?
     createdAt   DateTime           @default(now())

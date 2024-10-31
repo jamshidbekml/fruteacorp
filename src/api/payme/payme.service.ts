@@ -191,6 +191,7 @@ export class PaymeService {
         status: 'pending',
         amount: createTransactionDto.params.amount,
         orederId: orderId,
+        type: 'payme',
       },
     });
 
@@ -289,38 +290,11 @@ export class PaymeService {
       },
     });
 
-    if (order.type === 'subscription') {
-      const subscription = await this.prismaService.subscription.findUnique({
-        where: {
-          id: order.subscriptionId,
-        },
-      });
-
-      await this.prismaService.userSubscription.updateMany({
-        where: {
-          userId: order.userId,
-        },
-        data: { active: false, expired: true },
-      });
-
-      await this.prismaService.userSubscription.create({
-        data: {
-          userId: order.userId,
-          subscriptionId: subscription.id,
-          active: true,
-          discount: subscription.discount,
-          expiresAt: new Date(
-            new Date().setMonth(new Date().getMonth() + subscription.duration),
-          ),
-        },
-      });
-    } else {
-      await this.prismaService.cart.deleteMany({
-        where: {
-          userId: order.userId,
-        },
-      });
-    }
+    await this.prismaService.cart.deleteMany({
+      where: {
+        userId: order.userId,
+      },
+    });
 
     return {
       result: {
@@ -359,7 +333,7 @@ export class PaymeService {
         },
       });
 
-      const order = await this.prismaService.orders.update({
+      await this.prismaService.orders.update({
         where: {
           id: cancelTransaction.orederId,
         },
@@ -367,17 +341,6 @@ export class PaymeService {
           status: 'cancelled',
         },
       });
-
-      // if (order.type === 'subscription') {
-      //   const userSubscription =
-      //     await this.prismaService.userSubscription.findFirst({
-      //       where: {
-      //         userId: order.userId,
-      //         subscriptionId: order.subscriptionId,
-      //       },
-      //       orderBy
-      //     });
-      // }
 
       return {
         result: {

@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ApiModule } from './api/api.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { BotModule } from './bot/bot.module';
+import { BotService } from './bot/bot.service';
 
 @Module({
   imports: [
@@ -18,6 +20,13 @@ import { ScheduleModule } from '@nestjs/schedule';
       serveRoot: '/temp/images',
     }),
     ApiModule,
+    BotModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements OnApplicationBootstrap {
+  constructor(private readonly bot: BotService) {}
+
+  async onApplicationBootstrap() {
+    await this.bot.launch();
+  }
+}

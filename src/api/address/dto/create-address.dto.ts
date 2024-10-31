@@ -1,8 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Address } from '@prisma/client';
-import { IsDefined, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { UserAddress } from '@prisma/client';
+import {
+  IsDefined,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
-export class CreateAddressDto implements Partial<Address> {
+export class CreateAddressDto implements Partial<UserAddress> {
   @ApiProperty({
     description: 'Street name',
     required: true,
@@ -29,6 +35,16 @@ export class CreateAddressDto implements Partial<Address> {
   @IsNotEmpty()
   @IsString()
   long: string;
+
+  @ApiProperty({
+    description: 'Delivery area id',
+    required: true,
+    type: 'uuid',
+  })
+  @IsDefined()
+  @IsNotEmpty()
+  @IsUUID('4')
+  deliveryAreaId?: string;
 
   @ApiProperty({
     description: 'House entry code',

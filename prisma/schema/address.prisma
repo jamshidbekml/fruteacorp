@@ -1,9 +1,23 @@
-model Address {
+model Areas {
+    id            String        @id @default(uuid()) @db.Uuid
+    area          String        @unique
+    deliveryPrice Decimal       @db.Decimal(10, 2)
+    freeDelivery  Boolean       @default(false)
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+    UserAddress   UserAddress[]
+
+    @@map("areas")
+}
+
+model UserAddress {
     id             String   @id @default(uuid()) @db.Uuid
     userId         String   @db.Uuid
     streetName     String
     lat            String
     long           String
+    deliveryAreaId String   @db.Uuid
+    deliveryArea   Areas    @relation(fields: [deliveryAreaId], references: [id])
     houseEntryCode String?
     houseLine      String?
     houseNumber    String?
@@ -13,5 +27,5 @@ model Address {
     User   Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
     orders Orders[]
 
-    @@map("address")
+    @@map("user_address")
 }

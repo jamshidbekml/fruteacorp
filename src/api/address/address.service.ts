@@ -7,16 +7,23 @@ export class AddressService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createAddressDto: CreateAddressDto, userId: string) {
-    return await this.prismaService.address.create({
+    return await this.prismaService.userAddress.create({
       data: {
-        ...createAddressDto,
         userId,
+        deliveryAreaId: createAddressDto.deliveryAreaId,
+        lat: createAddressDto.lat,
+        long: createAddressDto.long,
+        streetName: createAddressDto.streetName,
+        houseEntryCode: createAddressDto?.houseEntryCode,
+        houseNumber: createAddressDto?.houseNumber,
+        houseLine: createAddressDto?.houseLine,
+        houseStage: createAddressDto?.houseStage,
       },
     });
   }
 
   async findAll(userId: string) {
-    return await this.prismaService.address.findMany({
+    return await this.prismaService.userAddress.findMany({
       where: {
         userId,
       },
@@ -24,7 +31,7 @@ export class AddressService {
   }
 
   async remove(id: string) {
-    await this.prismaService.address.delete({
+    await this.prismaService.userAddress.delete({
       where: { id },
     });
 

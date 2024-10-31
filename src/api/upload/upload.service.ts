@@ -15,6 +15,10 @@ export class UploadService {
       },
     });
 
-    return { id: imageData.id, url: url + imageData.name };
+    return {
+      id: imageData.id,
+      url: url + imageData.name,
+      name: imageData.name,
+    };
   }
 }

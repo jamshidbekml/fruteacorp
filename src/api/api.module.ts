@@ -15,9 +15,9 @@ import { UploadModule } from './upload/upload.module';
 import { TasksModule } from './tasks/tasks.module';
 import { PaymeModule } from './payme/payme.module';
 import { PromoModule } from './promo/promo.module';
-import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { BannerModule } from './banner/banner.module';
 import { AddressModule } from './address/address.module';
+import { AreasModule } from './areas/areas.module';
 @Module({
   imports: [
     AuthModule,
@@ -33,9 +33,9 @@ import { AddressModule } from './address/address.module';
     TasksModule,
     PaymeModule,
     PromoModule,
-    SubscriptionsModule,
     BannerModule,
     AddressModule,
+    AreasModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AccessTokenGuard },

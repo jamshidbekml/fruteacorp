@@ -8,10 +8,14 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { generatePaymeUrl } from '../shared/utils/payme-url-generator';
 import { $Enums } from '@prisma/client';
+import { PromoService } from '../promo/promo.service';
 
 @Injectable()
 export class OrdersService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private readonly promoService: PromoService,
+  ) {}
 
   async create(createOrderDto: CreateOrderDto, userId: string) {
     const cart = await this.prismaService.cart.findUnique({
@@ -30,6 +34,29 @@ export class OrdersService {
     if (!cart || cart.products.length === 0)
       throw new BadRequestException("Savat topilmadi yoki bo'sh");
 
+    let amount: number = 0;
+
+    for (const product of cart.products) {
+      amount =
+        amount +
+        (product.Product.discountStatus === 'active'
+          ? Number(product.Product.amount) -
+            Number(product.Product.discountAmount)
+          : Number(product.Product.amount)) *
+          product.quantity;
+    }
+
+    if (createOrderDto.promoCodeId) {
+      const foundPromo = await this.promoService.findOne(
+        createOrderDto.promoCodeId,
+      );
+
+      await this.promoService.validate(
+        { promocode: foundPromo.promocode, amount },
+        userId,
+      );
+    }
+
     const promo = createOrderDto.promoCodeId
       ? await this.prismaService.promoCodes.findUnique({
           where: { id: createOrderDto.promoCodeId },
@@ -39,42 +66,29 @@ export class OrdersService {
         })
       : { discount: 0 };
 
+    const address = await this.prismaService.userAddress.findUnique({
+      where: { id: createOrderDto.addressId },
+      include: {
+        deliveryArea: true,
+      },
+    });
+
+    const deliveryPrice = address.deliveryArea.freeDelivery
+      ? 0
+      : Number(address.deliveryArea.deliveryPrice);
+
+    amount = amount + deliveryPrice;
+
     return await this.prismaService.$transaction(async (prisma) => {
-      const subscription = await prisma.userSubscription.findFirst({
-        where: {
-          userId,
-          active: true,
-        },
-        include: {
-          Subscription: true,
-        },
-        orderBy: { createdAt: 'desc' },
-      });
-
-      let amount: number = 0;
-
-      for (const product of cart.products) {
-        amount =
-          amount +
-          (product.Product.discountStatus === 'active'
-            ? Number(product.Product.amount) -
-              Number(product.Product.discountAmount)
-            : Number(product.Product.amount)) *
-            product.quantity;
-      }
-
-      const discount = subscription
-        ? (subscription.Subscription.discount * amount) / 100 - promo.discount
-        : promo.discount;
-
       const order = await prisma.orders.create({
         data: {
           addressId: createOrderDto.addressId,
           amount,
-          discountAmount: discount,
-          totalAmount: amount - discount,
+          discountAmount: promo.discount,
+          totalAmount: amount - promo.discount,
           userId,
           deliveryInfo: createOrderDto.deliveryInfo,
+          deliveryPrice,
         },
       });
 
@@ -109,7 +123,7 @@ export class OrdersService {
 
       return {
         order,
-        paymeUrl: generatePaymeUrl(order.id, (amount - discount) * 100),
+        paymeUrl: generatePaymeUrl(order.id, (amount - promo.discount) * 100),
       };
     });
   }
