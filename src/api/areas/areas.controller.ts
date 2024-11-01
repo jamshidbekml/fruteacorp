@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AreasService } from './areas.service';
 import { CreateAreaDto } from './dto/create-area.dto';
@@ -17,9 +18,11 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import { TransformInterceptor } from '../interceptors/transform.interceptor';
 
 @ApiBearerAuth()
 @ApiTags('Areas')
+@UseInterceptors(TransformInterceptor)
 @Controller('areas')
 export class AreasController {
   constructor(private readonly areasService: AreasService) {}

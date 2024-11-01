@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { UpdateAreaDto } from './dto/update-area.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -8,12 +12,14 @@ export class AreasService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createAreaDto: CreateAreaDto) {
-    const found = this.prismaService.areas.findUnique({
+    const found = await this.prismaService.areas.findUnique({
       where: { area: createAreaDto.area },
     });
 
+    console.log(found);
+
     if (found) {
-      throw new Error('Area already exists');
+      throw new BadRequestException('Area already exists');
     }
 
     return await this.prismaService.areas.create({ data: createAreaDto });
