@@ -13,7 +13,12 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Public } from './decorators/public.decorator';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
-import { AuthDto, ChangePasswordDto, SignupDto } from './dto/auth.dto';
+import {
+  AuthDto,
+  ChangePasswordDto,
+  PhoneDto,
+  SignupDto,
+} from './dto/auth.dto';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
 
 @ApiTags('auth')
@@ -52,8 +57,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Send SMS in order to change password' })
   @Public()
   @Post('send-sms')
-  sendSms(@Body() body: string) {
-    return this.authService.sendSmsForChangePassword(userId);
+  sendSms(@Body() body: PhoneDto) {
+    return this.authService.sendSmsForChangePassword(body.phone);
   }
 
   @ApiOperation({ summary: 'Change password' })
@@ -61,6 +66,6 @@ export class AuthController {
   @Public()
   @Post('change-password')
   changePassword(@Body() body: ChangePasswordDto) {
-    return this.authService.changePassword(userId, body);
+    return this.authService.changePassword(body);
   }
 }

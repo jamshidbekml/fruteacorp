@@ -8,12 +8,14 @@ import {
   Length,
   MinLength,
 } from 'class-validator';
+import { IsCorrectPhoneNumber } from 'src/api/shared/dto/phone.dto';
 
 export class AuthDto {
   @ApiProperty({ description: `Field to enter user's phone`, required: true })
   @IsDefined()
   @IsNotEmpty()
   @IsString()
+  @IsCorrectPhoneNumber({ message: 'Phone number is not correct' })
   phone: string;
 
   @ApiProperty({
@@ -43,6 +45,7 @@ export class SignupDto {
   @IsDefined()
   @IsNotEmpty()
   @IsString()
+  @IsCorrectPhoneNumber({ message: 'Phone number is not correct' })
   phone: string;
 
   @ApiProperty({
@@ -73,12 +76,21 @@ export class ChangePasswordDto {
   @IsString()
   @Length(5, 5, { message: 'Code must be 5 characters long' })
   code: string;
-}
 
-export class PhoneDto {
+  @ApiProperty({ description: `Field to enter user's phone`, required: true })
   @IsDefined()
   @IsNotEmpty()
   @IsString()
+  @IsCorrectPhoneNumber({ message: 'Phone number is not correct' })
+  phone: string;
+}
+
+export class PhoneDto {
+  @ApiProperty({ description: `Field to enter user's phone`, required: true })
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
+  @IsCorrectPhoneNumber({ message: 'Phone number is not correct' })
   phone: string;
 }
 

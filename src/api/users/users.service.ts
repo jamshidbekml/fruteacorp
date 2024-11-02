@@ -26,13 +26,14 @@ export class UsersService {
       );
 
     createUserDto.password = await argon2.hash(createUserDto.password);
+    createUserDto.phone = Number(createUserDto.phone).toString();
 
     return await this.prismaService.users.create({ data: createUserDto });
   }
 
   async findByPhone(phone: string) {
     return await this.prismaService.users.findUnique({
-      where: { phone },
+      where: { phone: Number(phone).toString() },
     });
   }
 

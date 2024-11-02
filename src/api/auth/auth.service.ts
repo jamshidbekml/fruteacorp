@@ -175,7 +175,7 @@ export class AuthService {
     }
     const code = generateRandomNumber(5);
     const message = `Frutecorp savdo platformasi foydalanuchining parolini o'zgartirish uchun tasdiqlash kodi: ${code}`;
-    const isSent = await smsSender(user.phone, message);
+    const isSent = await smsSender(Number(user.phone).toString(), message);
 
     if (!isSent)
       throw new BadRequestException(
@@ -192,9 +192,9 @@ export class AuthService {
     return `Xabar muvaffaqiyatli yuborildi`;
   }
 
-  async changePassword(id: string, data: ChangePasswordDto) {
+  async changePassword(data: ChangePasswordDto) {
     const user = await this.prismaService.users.findUnique({
-      where: { id },
+      where: { phone: data.phone },
       include: {
         otps: {
           orderBy: {
@@ -204,6 +204,10 @@ export class AuthService {
         },
       },
     });
+
+    if (!user) {
+      throw new BadRequestException('Foydalanuvchi topilmadi!');
+    }
 
     const otp = user.otps[0];
 
@@ -227,7 +231,7 @@ export class AuthService {
 
     await this.prismaService.users.update({
       where: {
-        id,
+        id: user.id,
       },
       data: {
         password: newPassword,

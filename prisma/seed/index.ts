@@ -10,7 +10,7 @@ async function seed() {
     const prismaClient = new PrismaClient();
     await settingsSeed(config, prismaClient);
     const exists = await prismaClient.users.findUnique({
-      where: { phone: config.get('ADMIN_PHONE') },
+      where: { phone: Number(config.get('ADMIN_PHONE')).toString() },
     });
     if (!exists) {
       const hash = await argon2.hash(config.get('ADMIN_PASSWORD'));
@@ -20,7 +20,7 @@ async function seed() {
           lastName: 'Doe',
           password: hash,
           role: 'superadmin',
-          phone: config.get('ADMIN_PHONE'),
+          phone: Number(config.get('ADMIN_PHONE')).toString(),
         },
       });
       console.log('Data seeded successfully'.bgGreen.bold);
