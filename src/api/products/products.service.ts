@@ -79,6 +79,8 @@ export class ProductsService {
     search?: string,
     categoryId?: string,
   ) {
+    if (limit > 50) throw new BadRequestException('limit must be less than 50');
+
     const data = await this.prismaService.products.findMany({
       where: {
         ...(search
@@ -135,7 +137,19 @@ export class ProductsService {
       },
     });
 
-    return { data, total, pageSize: limit, current: page };
+    const products = [];
+
+    for await (const product of data) {
+      const stats = await this.prismaService.review.aggregate({
+        where: { productId: product.id },
+        _avg: { rate: true },
+        _count: { productId: true },
+      });
+
+      products.push({ ...product, rating: stats._avg, reviews: stats._count });
+    }
+
+    return { data: products, total, pageSize: limit, current: page };
   }
 
   async findOne(id: string) {
@@ -148,12 +162,19 @@ export class ProductsService {
             isMain: true,
           },
         },
+        Reviews: true,
       },
     });
 
     if (!product) throw new BadRequestException('Mahsulot topilmadi!');
 
-    return { ...product, isCart: false };
+    const stats = await this.prismaService.review.aggregate({
+      where: { productId: product.id },
+      _avg: { rate: true },
+      _count: { productId: true },
+    });
+
+    return { ...product, rating: stats._avg, reviews: stats._count };
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {

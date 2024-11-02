@@ -25,6 +25,7 @@ import { Roles } from '../auth/decorators/role.decorator';
 import { ROLE } from '@prisma/client';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
 import { ValidatePromoDto } from './dto/valitade-promo.dto';
+import { Request } from 'express';
 
 @ApiTags('Promo')
 @ApiBearerAuth()

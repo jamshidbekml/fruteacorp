@@ -4,12 +4,13 @@ import { Bot, GrammyError, HttpError, session } from 'grammy';
 import { Router } from '@grammyjs/router';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/api/prisma/prisma.service';
+import * as fs from 'fs';
 
 @Injectable()
 export class BotService {
   private bot: Bot;
   private router;
-  private isLaunched = false;
+  private readonly lockFile = '/tmp/bot.lock';
 
   constructor(
     private readonly configService: ConfigService,
@@ -70,8 +71,13 @@ export class BotService {
   }
 
   public async launch() {
-    console.log('Starting bot...');
-    await this.bot.start();
-    console.log('Bot started!');
+    if (fs.existsSync(this.lockFile)) {
+      console.log('Boshqa bot instansiyasi allaqachon ishlayapti.');
+      process.exit(1); // Dasturdan chiqish
+    } else {
+      // Fayl yaratish orqali boshqa instansiyalarni bloklaymiz
+      fs.writeFileSync(this.lockFile, 'running');
+      console.log('Bot ishga tushdi');
+    }
   }
 }

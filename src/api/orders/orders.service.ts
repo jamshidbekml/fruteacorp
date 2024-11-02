@@ -89,6 +89,7 @@ export class OrdersService {
           userId,
           deliveryInfo: createOrderDto.deliveryInfo,
           deliveryPrice,
+          paymentType: createOrderDto.paymentType,
         },
       });
 

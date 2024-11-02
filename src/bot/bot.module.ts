@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { Global, Module, OnModuleInit } from '@nestjs/common';
 import { BotService } from './bot.service';
 
 @Global()
@@ -6,4 +6,10 @@ import { BotService } from './bot.service';
   providers: [BotService],
   exports: [BotService],
 })
-export class BotModule {}
+export class BotModule implements OnModuleInit {
+  constructor(private readonly bot: BotService) {}
+
+  async onModuleInit() {
+    await this.bot.launch();
+  }
+}

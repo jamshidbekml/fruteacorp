@@ -1,7 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Orders, UserAddress, UserSubscription } from '@prisma/client';
 import { Expose } from 'class-transformer';
-import { IsDefined, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsDefined,
+  IsNotEmpty,
+  IsString,
+  Length,
+  MinLength,
+} from 'class-validator';
 
 export class AuthDto {
   @ApiProperty({ description: `Field to enter user's phone`, required: true })
@@ -46,7 +52,34 @@ export class SignupDto {
   @IsDefined()
   @IsNotEmpty()
   @IsString()
+  @MinLength(6)
   password: string;
+}
+
+export class ChangePasswordDto {
+  @ApiProperty({
+    description: `Field to enter user's password`,
+    required: true,
+  })
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(6)
+  password: string;
+
+  @ApiProperty({ description: `Field to enter code`, required: true })
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
+  @Length(5, 5, { message: 'Code must be 5 characters long' })
+  code: string;
+}
+
+export class PhoneDto {
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
+  phone: string;
 }
 
 export class GetMeDto {

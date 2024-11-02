@@ -18,6 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
+import { Request } from 'express';
 
 @ApiBearerAuth()
 @ApiTags('Address')

@@ -1,0 +1,14 @@
+model Review {
+    id        String   @id @default(uuid()) @db.Uuid
+    rate      Int      @default(5)
+    comment   String
+    productId String   @db.Uuid
+    userId    String   @db.Uuid
+    orderId   String   @db.Uuid
+    createdAt DateTime @default(now())
+    Product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+    Order     Orders   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    User      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("reviews")
+}

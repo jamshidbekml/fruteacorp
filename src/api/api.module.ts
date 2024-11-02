@@ -18,6 +18,7 @@ import { PromoModule } from './promo/promo.module';
 import { BannerModule } from './banner/banner.module';
 import { AddressModule } from './address/address.module';
 import { AreasModule } from './areas/areas.module';
+import { ReviewModule } from './review/review.module';
 @Module({
   imports: [
     AuthModule,
@@ -36,6 +37,7 @@ import { AreasModule } from './areas/areas.module';
     BannerModule,
     AddressModule,
     AreasModule,
+    ReviewModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AccessTokenGuard },

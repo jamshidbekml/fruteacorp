@@ -5,14 +5,15 @@ import {
   Get,
   UseGuards,
   UseInterceptors,
+  Post,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GetMe, SignIn, SignUp } from './decorators/auth.decorator';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Public } from './decorators/public.decorator';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
-import { AuthDto, SignupDto } from './dto/auth.dto';
+import { AuthDto, ChangePasswordDto, SignupDto } from './dto/auth.dto';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
 
 @ApiTags('auth')
@@ -46,5 +47,20 @@ export class AuthController {
     const userId = req['user']['sub'];
     const refreshToken = req['user']['refreshToken'];
     return this.authService.refreshTokens(userId, refreshToken);
+  }
+
+  @ApiOperation({ summary: 'Send SMS in order to change password' })
+  @Public()
+  @Post('send-sms')
+  sendSms(@Body() body: string) {
+    return this.authService.sendSmsForChangePassword(userId);
+  }
+
+  @ApiOperation({ summary: 'Change password' })
+  @ApiBody({ type: ChangePasswordDto })
+  @Public()
+  @Post('change-password')
+  changePassword(@Body() body: ChangePasswordDto) {
+    return this.authService.changePassword(userId, body);
   }
 }

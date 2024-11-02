@@ -21,6 +21,7 @@ model Products {
     WishlistProduct   WishlistProduct[]
     OrderProduct      OrderProduct[]
     CartProduct       CartProduct[]
+    Reviews           Review[]
 
     @@map("products")
 }

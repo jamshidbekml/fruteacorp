@@ -31,7 +31,9 @@ export class UsersService {
   }
 
   async findByPhone(phone: string) {
-    return await this.prismaService.users.findUnique({ where: { phone } });
+    return await this.prismaService.users.findUnique({
+      where: { phone },
+    });
   }
 
   async findByid(id: string) {
@@ -52,6 +54,7 @@ export class UsersService {
                 deliveryArea: true,
               },
             },
+            Reviews: true,
             createdAt: true,
             deliveryInfo: true,
             type: true,
@@ -132,12 +135,10 @@ export class UsersService {
     const user = await this.findByid(id);
 
     if (updateUserDto?.role && ROLE.superadmin !== role)
-      throw new BadRequestException('Foydalanuvchi admin bo`lishi kerak');
+      throw new BadRequestException('Access denied!');
 
     if (sub === id && updateUserDto.role)
-      throw new BadRequestException(
-        'Siz o`zingiz uchun rolni o`zgartirishingiz mumkin emas!',
-      );
+      throw new BadRequestException('Access denied!');
 
     delete updateUserDto?.phone;
     return await this.prismaService.users.update({

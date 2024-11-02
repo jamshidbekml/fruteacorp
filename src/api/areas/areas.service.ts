@@ -13,10 +13,8 @@ export class AreasService {
 
   async create(createAreaDto: CreateAreaDto) {
     const found = await this.prismaService.areas.findUnique({
-      where: { area: createAreaDto.area },
+      where: { areaUZ: createAreaDto.areaUZ, areaRU: createAreaDto.areaRU },
     });
-
-    console.log(found);
 
     if (found) {
       throw new BadRequestException('Area already exists');
@@ -32,6 +30,9 @@ export class AreasService {
   async findOne(id: string) {
     const data = await this.prismaService.areas.findUnique({
       where: { id },
+      include: {
+        UserAddress: true,
+      },
     });
 
     if (!data) throw new NotFoundException('Area topilmadi!');
@@ -50,6 +51,11 @@ export class AreasService {
 
   async remove(id: string) {
     const area = await this.findOne(id);
+
+    if (area.UserAddress.length > 0)
+      throw new NotFoundException(
+        'Area o`chirish imkoni yo`q! Uning allaqchon buyurtmalari mavjud',
+      );
 
     await this.prismaService.areas.delete({ where: { id: area.id } });
 
