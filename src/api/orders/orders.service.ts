@@ -9,12 +9,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { generatePaymeUrl } from '../shared/utils/payme-url-generator';
 import { $Enums } from '@prisma/client';
 import { PromoService } from '../promo/promo.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OrdersService {
   constructor(
     private prismaService: PrismaService,
     private readonly promoService: PromoService,
+    private readonly configService: ConfigService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto, userId: string) {
@@ -122,10 +124,22 @@ export class OrdersService {
         });
       }
 
-      return {
-        order,
-        paymeUrl: generatePaymeUrl(order.id, (amount - promo.discount) * 100),
-      };
+      if (createOrderDto.paymentType === $Enums.PAYMENT_TYPE.payme) {
+        return {
+          order,
+          paymentUrl: generatePaymeUrl(
+            order.id,
+            (amount - promo.discount) * 100,
+          ),
+        };
+      } else {
+        const serviceId = this.configService.get('CLICK_SERVICE_ID');
+        const merchantId = this.configService.get('CLICK_MERCHANT_ID');
+        return {
+          order,
+          paymentUrl: `https://my.click.uz/services/pay?service_id=${serviceId}&merchant_id=${merchantId}&amount=${amount - promo.discount}&transaction_param=${order.id}`,
+        };
+      }
     });
   }
 

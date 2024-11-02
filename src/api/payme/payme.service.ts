@@ -191,7 +191,7 @@ export class PaymeService {
         status: 'pending',
         amount: createTransactionDto.params.amount,
         orederId: orderId,
-        type: 'payme',
+        provider: 'payme',
       },
     });
 

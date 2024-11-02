@@ -4,9 +4,10 @@ model Transactions {
     orederId    String?            @db.Uuid
     amount      Int
     reason      Int?
-    state       Int
+    state       Int?
+    prepareId   Int?               @unique
     status      TRANSACTION_STATUS
-    type        PAYMENT_TYPE
+    provider    PAYMENT_TYPE
     performTime DateTime?
     cancelTime  DateTime?
     createdAt   DateTime           @default(now())
