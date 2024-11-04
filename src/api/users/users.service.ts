@@ -48,6 +48,7 @@ export class UsersService {
                 productId: true,
                 amount: true,
                 quantity: true,
+                title_uz: true,
                 title_ru: true,
               },
             },
