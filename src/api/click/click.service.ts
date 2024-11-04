@@ -108,6 +108,11 @@ export class ClickService {
       },
     });
 
+    await this.prismaService.orders.update({
+      where: { id: orderId },
+      data: { status: 'pending_payment' },
+    });
+
     return {
       click_trans_id: prepareActionDto.click_trans_id,
       merchant_trans_id: prepareActionDto.merchant_trans_id,
@@ -175,6 +180,21 @@ export class ClickService {
       },
       data: {
         status: 'paid',
+      },
+    });
+
+    await this.prismaService.orders.update({
+      where: {
+        id: order.id,
+      },
+      data: {
+        status: 'paid',
+      },
+    });
+
+    await this.prismaService.cart.deleteMany({
+      where: {
+        userId: order.userId,
       },
     });
 
