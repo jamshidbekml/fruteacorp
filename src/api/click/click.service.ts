@@ -17,7 +17,7 @@ export class ClickService {
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
   ) {
-    this.secretKey = this.configService.get<string>('CLICK_SECRET');
+    this.secretKey = this.configService.get<string>('SECRET_KEY');
   }
 
   async handleMerchantTransactions(clickReqBody: ClickRequestBody) {
