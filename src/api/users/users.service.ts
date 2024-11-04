@@ -45,14 +45,25 @@ export class UsersService {
           select: {
             items: {
               select: {
+                productId: true,
                 amount: true,
                 quantity: true,
                 title_ru: true,
               },
             },
             Address: {
-              include: {
-                deliveryArea: true,
+              select: {
+                deliveryArea: {
+                  select: {
+                    areaRU: true,
+                    areaUZ: true,
+                  },
+                },
+                streetName: true,
+                houseNumber: true,
+                houseEntryCode: true,
+                houseLine: true,
+                houseStage: true,
               },
             },
             Reviews: true,
