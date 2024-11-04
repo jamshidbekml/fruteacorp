@@ -50,6 +50,13 @@ export class UsersService {
                 quantity: true,
                 title_uz: true,
                 title_ru: true,
+                Product: {
+                  select: {
+                    images: {
+                      where: { isMain: true },
+                    },
+                  },
+                },
               },
             },
             Address: {
