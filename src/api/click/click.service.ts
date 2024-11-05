@@ -69,6 +69,8 @@ export class ClickService {
       };
     }
 
+    console.log('totalAmount', order.totalAmount);
+    console.log('amount', prepareActionDto.amount);
     if (Number(order.totalAmount) !== prepareActionDto.amount) {
       return {
         error: ClickError.InvalidAmount,
