@@ -101,7 +101,7 @@ export class ClickService {
     const newTransaction = await this.prismaService.transactions.create({
       data: {
         uid: prepareActionDto.click_trans_id.toString(),
-        amount: Number(prepareActionDto.amount.toFixed(2)) * 100,
+        amount: Number(prepareActionDto.amount) * 100,
         createdAt: new Date(time),
         status: 'pending',
         orederId: orderId,
