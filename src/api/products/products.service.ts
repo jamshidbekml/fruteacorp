@@ -162,7 +162,17 @@ export class ProductsService {
             isMain: true,
           },
         },
-        Reviews: true,
+        Reviews: {
+          select: {
+            id: true,
+            comment: true,
+            rate: true,
+            User: {
+              select: { id: true, firstName: true, lastName: true },
+            },
+            replies: true,
+          },
+        },
       },
     });
 

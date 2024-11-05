@@ -44,3 +44,15 @@ export class CreateReviewDto implements Partial<Review> {
   @IsUUID()
   productId: string;
 }
+
+export class ReplyDto {
+  @ApiProperty({
+    description: 'Message',
+    required: true,
+    type: 'string',
+  })
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
+  message: string;
+}

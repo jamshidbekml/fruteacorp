@@ -54,6 +54,9 @@ export class UsersService {
                   select: {
                     images: {
                       where: { isMain: true },
+                      select: {
+                        image: { select: { name: true } },
+                      },
                     },
                   },
                 },
@@ -74,7 +77,14 @@ export class UsersService {
                 houseStage: true,
               },
             },
-            Reviews: true,
+            Reviews: {
+              select: {
+                id: true,
+                comment: true,
+                rate: true,
+                replies: true,
+              },
+            },
             createdAt: true,
             deliveryInfo: true,
             type: true,

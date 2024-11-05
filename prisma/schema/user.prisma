@@ -5,6 +5,7 @@ model Users {
     phone         String             @unique
     password      String
     refreshToken  String?
+    telegramId    String?            @unique
     role          ROLE               @default(user)
     orders        Orders[]
     otps          Otps[]

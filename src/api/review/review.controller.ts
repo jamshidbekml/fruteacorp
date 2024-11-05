@@ -10,7 +10,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
-import { CreateReviewDto } from './dto/create-review.dto';
+import { CreateReviewDto, ReplyDto } from './dto/create-review.dto';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -50,6 +50,15 @@ export class ReviewController {
   @Get()
   findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
     return this.reviewService.findAll(page, limit);
+  }
+
+  @Roles(ROLE.superadmin, ROLE.operator)
+  @ApiOperation({ summary: 'Write reply message' })
+  @ApiBody({ type: ReplyDto })
+  @ApiParam({ name: 'id' })
+  @Post('reply/:id')
+  reply(@Param('id') id: string, @Body() { message }: ReplyDto) {
+    return this.reviewService.replyToReview(id, { message });
   }
 
   @Roles(ROLE.superadmin, ROLE.operator)

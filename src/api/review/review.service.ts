@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateReviewDto } from './dto/create-review.dto';
+import { CreateReviewDto, ReplyDto } from './dto/create-review.dto';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -46,6 +46,22 @@ export class ReviewService {
     return 'Sharx muvaffaqiyatli qabul qilindi!';
   }
 
+  async replyToReview(id: string, { message }: ReplyDto) {
+    const review = await this.findOne(id);
+
+    if (review.replies)
+      throw new BadRequestException('Sharx allaqachon javob berildi!');
+
+    await this.prismaService.replies.create({
+      data: {
+        message,
+        reviewId: review.id,
+      },
+    });
+
+    return 'Sharx muvaffaqiyatli qabul qilindi!';
+  }
+
   async findAll(page: number, limit: number) {
     const data = await this.prismaService.review.findMany({
       skip: (page - 1) * limit,
@@ -65,6 +81,7 @@ export class ReviewService {
   async findOne(id: string) {
     const review = await this.prismaService.review.findUnique({
       where: { id },
+      include: { replies: true },
     });
 
     if (!review) throw new BadRequestException('Sharx topilmadi!');

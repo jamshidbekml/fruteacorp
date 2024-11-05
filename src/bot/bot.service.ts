@@ -1,16 +1,16 @@
 import parseUrl from 'url-parse';
 import { Injectable } from '@nestjs/common';
-import { Bot, GrammyError, HttpError, session } from 'grammy';
+import { Bot, GrammyError, HttpError, session, Keyboard } from 'grammy';
 import { Router } from '@grammyjs/router';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/api/prisma/prisma.service';
-import * as fs from 'fs';
+import { generateRandomNumber } from 'src/api/shared/utils/code-generator';
+import { smsSender } from 'src/api/shared/utils/sms-sender';
 
 @Injectable()
 export class BotService {
   private bot: Bot;
   private router;
-  private readonly lockFile = '/tmp/bot.lock';
 
   constructor(
     private readonly configService: ConfigService,
@@ -26,33 +26,96 @@ export class BotService {
     this.router = new Router((ctx) => ctx['session'].step);
 
     this.setupMiddleware();
+    this.setupCommands();
     this.setupRoutes();
     this.setupErrorHandling();
   }
 
-  private setupMiddleware() {
-    this.bot.use(session({ initial: () => ({ step: 'idle' }) }));
-    this.bot.use(this.router);
+  private setupCommands() {
+    this.bot.command('start', async (ctx) => {
+      await ctx.reply(
+        `<b>Xush kelibsiz!</b>\nBot imkoniyatlaridan foydalanish uchun raqamingizni tasdiqlang.`,
+        {
+          reply_markup: new Keyboard()
+            .requestContact('Share Contact')
+            .resized(),
+          parse_mode: 'HTML',
+        },
+      );
+      ctx['session'].step = 'send-sms';
+    });
   }
 
   private setupRoutes() {
-    this.router.route('start', async (ctx) => {
-      await ctx.reply('Welcome to the bot!');
-      ctx.session.step = 'next_step';
+    this.router.route('send-sms', async (ctx) => {
+      console.log(ctx.message.contact);
+      const phone = ctx.message.contact.phone_number;
+      const user = await this.prismaService.users.findUnique({
+        where: { phone: Number(phone).toString() },
+      });
+
+      if (!user || !['operator', 'packman'].includes(user.role)) {
+        await ctx.reply(
+          `Bunday raqamli foydalanuvchi topilmadi!\n\n<a href="https://fruteacorp.uz">Fruteacorp</a> platformasi orqali ro'yxatdan o'ting.`,
+          {
+            reply_markup: { remove_keyboard: true },
+            parse_mode: 'HTML',
+          },
+        );
+
+        ctx['session'].step = 'idle';
+
+        return;
+      }
+
+      const code = generateRandomNumber(5);
+
+      const message = `Fruteacorp.uz savdo platformasiga kirish kodi: ${code}. UNI HECH KIMGA AYTMANG. fruteacorp.uz #${code}`;
+      await smsSender(Number(user.phone).toString(), message);
+
+      ctx['session'].step = 'confirm-code';
+      return ctx.reply(
+        `Sizga tasdiqlash kodi yuborildi!\n\n<b>Tasdiqlash kodini kiriting.</b> 👇`,
+        { parse_mode: 'HTML', reply_markup: { remove_keyboard: true } },
+      );
+
+      // if (user.role === 'packman') {
+      //   await ctx.reply(
+      //     `Assalomu alakum ${user.firstName}.\nBu yerda siz yetkazib berish uchun buyurtmalarni qabul qilishingiz mumkin!`,
+      //   );
+      // }
+
+      // const name = ctx.message.contact.first_name;
+      // const message =
+      //   `Sizning ismingiz ${name} va telefon raqamingiz ${phone} ga jo` +
+      //   'natirilgan.';
+      // await ctx.reply(message);
     });
 
-    this.router.route('next_step', async (ctx) => {
-      await ctx.reply('You are now in the next step.');
-      ctx.session.step = 'end';
+    this.router.route('confirm-code', async (ctx) => {
+      console.log(ctx.message.text);
     });
 
-    this.bot.command('help', async (ctx) => {
-      await ctx.reply('Here is some help text.');
+    this.bot.on('message:contact', async (ctx) => {
+      ctx['session'].contact = ctx.message.contact;
+      await ctx.reply('Received a message!', {
+        reply_markup: { remove_keyboard: true },
+      });
     });
+  }
 
-    this.bot.on('message', async (ctx) => {
-      await ctx.reply('Received a message!');
-    });
+  private setupMiddleware() {
+    this.bot.use(
+      session({
+        initial: () => ({
+          chat_id: null,
+          role: null,
+          step: 'idle',
+          contact: null,
+        }),
+      }),
+    );
+    this.bot.use(this.router);
   }
 
   private setupErrorHandling() {
@@ -71,13 +134,13 @@ export class BotService {
   }
 
   public async launch() {
-    if (fs.existsSync(this.lockFile)) {
-      console.log('Boshqa bot instansiyasi allaqachon ishlayapti.');
-      process.exit(1); // Dasturdan chiqish
-    } else {
-      // Fayl yaratish orqali boshqa instansiyalarni bloklaymiz
-      fs.writeFileSync(this.lockFile, 'running');
-      console.log('Bot ishga tushdi');
-    }
+    await this.bot.api.setMyCommands([
+      {
+        command: 'start',
+        description: 'Start the bot',
+      },
+    ]);
+
+    this.bot.start();
   }
 }
