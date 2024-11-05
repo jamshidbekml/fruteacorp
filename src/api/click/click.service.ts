@@ -133,6 +133,7 @@ export class ClickService {
       amount: confirmActionDto.amount,
       action: confirmActionDto.action,
       signTime: confirmActionDto.sign_time,
+      merchantPrepareId: confirmActionDto.merchant_prepare_id,
     };
 
     const myMD5Hash = this.generateMD5(myMD5Params);
@@ -210,7 +211,7 @@ export class ClickService {
   }
 
   public generateMD5(params: GenerateMd5HashParams, algo = 'md5') {
-    const content = `${params.clickTransId}${params.serviceId}${params.secretKey}${params.merchantTransId}${params.amount}${params.action}${params.signTime}`;
+    const content = `${params.clickTransId}${params.serviceId}${params.secretKey}${params.merchantTransId}${params.merchantPrepareId ? params.merchantPrepareId : ''}${params.amount}${params.action}${params.signTime}`;
 
     const hashFunc = createHash(algo);
     hashFunc.update(content);
