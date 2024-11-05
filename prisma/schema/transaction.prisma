@@ -5,7 +5,7 @@ model Transactions {
     amount      Int
     reason      Int?
     state       Int?
-    prepareId   BigInt?               @unique
+    prepareId   String?            @unique
     status      TRANSACTION_STATUS
     provider    PAYMENT_TYPE
     performTime DateTime?

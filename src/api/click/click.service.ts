@@ -106,7 +106,7 @@ export class ClickService {
         status: 'pending',
         orederId: orderId,
         provider: 'click',
-        prepareId: time,
+        prepareId: time.toString(),
       },
     });
 
@@ -157,7 +157,7 @@ export class ClickService {
 
     const transaction = await this.prismaService.transactions.findUnique({
       where: {
-        prepareId: confirmActionDto.merchant_prepare_id,
+        prepareId: confirmActionDto.merchant_prepare_id.toString(),
         uid: confirmActionDto.click_trans_id.toString(),
       },
     });
