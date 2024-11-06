@@ -58,6 +58,18 @@ export class UsersService {
                         image: { select: { name: true } },
                       },
                     },
+                    Reviews: {
+                      select: {
+                        id: true,
+                        comment: true,
+                        rate: true,
+                        replies: true,
+                        createdAt: true,
+                      },
+                      where: {
+                        userId: id,
+                      },
+                    },
                   },
                 },
               },
@@ -75,14 +87,6 @@ export class UsersService {
                 houseEntryCode: true,
                 houseLine: true,
                 houseStage: true,
-              },
-            },
-            Reviews: {
-              select: {
-                id: true,
-                comment: true,
-                rate: true,
-                replies: true,
               },
             },
             createdAt: true,

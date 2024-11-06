@@ -37,11 +37,15 @@ export class AuthService {
   }
 
   async signup(data: SignupDto) {
-    const user = await this.userService.create(data);
+    try {
+      const user = await this.userService.create(data);
 
-    const tokens = await this.getTokens(user.id, user.phone, user.role);
+      const tokens = await this.getTokens(user.id, user.phone, user.role);
 
-    return { ...tokens, role: user.role };
+      return { ...tokens, role: user.role };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async updateRefreshToken(userId: string, refreshToken: string) {

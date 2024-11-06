@@ -137,7 +137,7 @@ export class OrdersService {
         const merchantId = this.configService.get('CLICK_MERCHANT_ID');
         return {
           order,
-          paymentUrl: `https://my.click.uz/services/pay?service_id=${serviceId}&merchant_id=${merchantId}&amount=${amount - promo.discount}&transaction_param=${order.id}`,
+          paymentUrl: `https://my.click.uz/services/pay?service_id=${serviceId}&merchant_id=${merchantId}&amount=${amount - promo.discount}&transaction_param=${order.id}&return_url=fruteacorp.uz`,
         };
       }
     });
