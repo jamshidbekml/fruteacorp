@@ -73,6 +73,19 @@ export class BotService {
       const message = `Fruteacorp.uz savdo platformasiga kirish kodi: ${code}. UNI HECH KIMGA AYTMANG. fruteacorp.uz #${code}`;
       await smsSender(Number(user.phone).toString(), message);
 
+      await this.prismaService.users.update({
+        where: { id: user.id },
+        data: { telegramId: ctx.from.id },
+      });
+
+      await this.prismaService.otps.create({
+        data: {
+          code: code.toString(),
+          userId: user.id,
+          type: 'bot',
+        },
+      });
+
       ctx['session'].step = 'confirm-code';
       return ctx.reply(
         `Sizga tasdiqlash kodi yuborildi!\n\n<b>Tasdiqlash kodini kiriting.</b> 👇`,
@@ -93,7 +106,9 @@ export class BotService {
     });
 
     this.router.route('confirm-code', async (ctx) => {
-      console.log(ctx.message.text);
+      const user = await this.prismaService.users.findUnique({
+        where: { telegramId: ctx.from.id },
+      });
     });
 
     this.bot.on('message:contact', async (ctx) => {
@@ -115,7 +130,31 @@ export class BotService {
         }),
       }),
     );
+
     this.bot.use(this.router);
+
+    this.bot.use(async (ctx, next) => {
+      if (
+        ctx['session'].step === 'idle' &&
+        ctx.message &&
+        ctx.message.text !== '/start'
+      ) {
+        try {
+          await ctx.deleteMessage();
+        } catch (err) {
+          console.error("Xabarni o'chirishda xato:", err);
+        }
+      } else {
+        await next();
+      }
+    });
+
+    this.bot.use(async (ctx, next) => {
+      const publicRoutes = ['idle', 'send-sms', 'confirm-code'];
+      if (!publicRoutes.includes(ctx['session'].step)) {
+        console.log(ctx['session'].step);
+      } else await next();
+    });
   }
 
   private setupErrorHandling() {

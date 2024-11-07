@@ -171,6 +171,7 @@ export class ProductsService {
               select: { id: true, firstName: true, lastName: true },
             },
             replies: true,
+            createdAt: true
           },
         },
       },

@@ -149,6 +149,7 @@ export class AuthService {
             createdAt: {
               gte: twentyFourHoursAgo,
             },
+            type: 'web',
           },
         },
       },
@@ -201,6 +202,9 @@ export class AuthService {
       where: { phone: data.phone },
       include: {
         otps: {
+          where: {
+            type: 'web',
+          },
           orderBy: {
             createdAt: 'desc',
           },

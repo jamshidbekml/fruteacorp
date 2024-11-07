@@ -34,3 +34,8 @@ enum PAYMENT_TYPE {
     payme
     click
 }
+
+enum OTP_TYPE {
+    web
+    bot
+}
