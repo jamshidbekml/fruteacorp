@@ -28,7 +28,7 @@ export class AuthService {
 
     const passwordMatches = await argon2.verify(user.password, data.password);
     if (!passwordMatches)
-      throw new UnauthorizedException('Parol noto`g`ri kiritilgan!');
+      throw new UnauthorizedException('Telefon raqam yoki parol notogri!');
 
     const tokens = await this.getTokens(user.id, user.phone, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken.token);

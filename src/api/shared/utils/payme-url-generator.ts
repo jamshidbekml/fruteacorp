@@ -9,7 +9,7 @@ export function generatePaymeUrl(orderId: string, amount: number) {
   const data =
     url +
     Buffer.from(
-      `m=${m};ac.order_id=${orderId};a=${amount};l=${'uz'};cr=${'UZS'}`,
+      `m=${m};ac.order_id=${orderId};a=${amount};l=${'uz'};cr=${'UZS'};c=https://fruteacorp-shop.vercel.app/user/orders`,
     ).toString('base64');
 
   return data;

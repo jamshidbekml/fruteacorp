@@ -20,6 +20,7 @@ import { AddressModule } from './address/address.module';
 import { AreasModule } from './areas/areas.module';
 import { ReviewModule } from './review/review.module';
 import { ClickModule } from './click/click.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 @Module({
   imports: [
     AuthModule,
@@ -40,6 +41,7 @@ import { ClickModule } from './click/click.module';
     AreasModule,
     ReviewModule,
     ClickModule,
+    DashboardModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AccessTokenGuard },

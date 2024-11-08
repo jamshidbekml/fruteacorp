@@ -14,9 +14,9 @@ export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const isExist = await this.prismaService.users.findFirst({
+    const isExist = await this.prismaService.users.findUnique({
       where: {
-        OR: [{ phone: createUserDto.phone }],
+        phone: Number(createUserDto.phone).toString(),
       },
     });
 
