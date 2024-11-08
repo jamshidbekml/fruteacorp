@@ -163,6 +163,19 @@ export class DashboardService {
       },
     });
 
+    const paid = await this.prismaService.orders.aggregate({
+      _count: {
+        id: true,
+      },
+      where: {
+        status: 'paid',
+        createdAt: {
+          gte: startOfDay,
+          lt: endOfDay,
+        },
+      },
+    });
+
     const pending = await this.prismaService.orders.aggregate({
       _count: {
         id: true,
@@ -207,6 +220,7 @@ export class DashboardService {
       pending: pending._count.id ?? 0,
       cancelled: cancelled._count.id ?? 0,
       onway: onway._count.id ?? 0,
+      paid: paid._count.id ?? 0,
       received: receivedMoney.reduce((acc, curr) => {
         acc[curr.paymentType] = curr._sum.totalAmount;
         return acc;
