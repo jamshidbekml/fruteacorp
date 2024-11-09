@@ -173,12 +173,12 @@ export class BotService {
   }
 
   public async launch() {
-    await this.bot.api.setMyCommands([
-      {
-        command: 'start',
-        description: 'Start the bot',
-      },
-    ]);
+    // await this.bot.api.setMyCommands([
+    //   {
+    //     command: 'start',
+    //     description: 'Start the bot',
+    //   },
+    // ]);
 
     this.bot.start();
   }

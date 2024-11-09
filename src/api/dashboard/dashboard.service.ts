@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Ordering, Sorting } from '../shared/enums';
 
 @Injectable()
 export class DashboardService {
@@ -226,5 +227,137 @@ export class DashboardService {
         return acc;
       }, {}),
     };
+  }
+
+  async products(
+    sorting: Sorting,
+    ordering: Ordering,
+    page: number,
+    regionId?: string,
+  ) {
+    if (regionId) {
+      switch (sorting) {
+        case 'rating': {
+          const offset = (page - 1) * 12;
+          const sortOrder = ordering == Ordering.asc ? 'ASC' : 'DESC';
+          const products = await this.prismaService.$queryRawUnsafe(`
+            SELECT p.id, p.title_uz, p.title_ru, p."inStock", p.sold, p.active, COALESCE(ROUND(AVG(r.rate), 2), 0) AS totalRating
+            FROM products AS p
+            LEFT JOIN (
+                SELECT DISTINCT op."productId"
+                FROM order_products AS op
+                JOIN orders AS o ON op."orderId" = o.id
+                JOIN user_address AS ua ON o."addressId" = ua.id
+                WHERE ua."deliveryAreaId" = '${regionId}'
+            ) AS filtered_orders ON p.id = filtered_orders."productId"
+            LEFT JOIN reviews AS r ON p.id = r."productId"
+            WHERE filtered_orders."productId" IS NOT NULL
+            GROUP BY p.id
+            ORDER BY totalRating ${sortOrder}
+            LIMIT ${12} OFFSET ${offset}
+          `);
+
+          const count = await this.prismaService.$queryRawUnsafe(`
+            SELECT CAST(COUNT(DISTINCT p.id) AS INT) AS total
+            FROM products AS p
+            LEFT JOIN (
+                SELECT DISTINCT op."productId"
+                FROM order_products AS op
+                JOIN orders AS o ON op."orderId" = o.id
+                JOIN user_address AS ua ON o."addressId" = ua.id
+                WHERE ua."deliveryAreaId" = '${regionId}'
+            ) AS filtered_orders ON p.id = filtered_orders."productId"
+            WHERE filtered_orders."productId" IS NOT NULL
+          `);
+
+          return {
+            data: products,
+            total: count[0].total,
+            pageSize: 12,
+            current: page,
+          };
+        }
+        case 'mostSold': {
+          const offset = (page - 1) * 12;
+          const sortOrder = ordering == Ordering.asc ? 'ASC' : 'DESC';
+          const products = await this.prismaService.$queryRawUnsafe(`
+            SELECT p.id, p.title_uz, p.title_ru, p."inStock", p.sold, p.active, COALESCE(ROUND(AVG(r.rate), 2), 0) AS totalRating
+            FROM products AS p
+            LEFT JOIN (
+                SELECT DISTINCT op."productId"
+                FROM order_products AS op
+                JOIN orders AS o ON op."orderId" = o.id
+                JOIN user_address AS ua ON o."addressId" = ua.id
+                WHERE ua."deliveryAreaId" = '${regionId}'
+            ) AS filtered_orders ON p.id = filtered_orders."productId"
+            LEFT JOIN reviews AS r ON p.id = r."productId"
+            WHERE filtered_orders."productId" IS NOT NULL
+            GROUP BY p.id
+            ORDER BY p.sold ${sortOrder}
+            LIMIT ${12} OFFSET ${offset}
+          `);
+
+          const count = await this.prismaService.$queryRawUnsafe(`
+            SELECT CAST(COUNT(DISTINCT p.id) AS INT) AS total
+            FROM products AS p
+            LEFT JOIN (
+                SELECT DISTINCT op."productId"
+                FROM order_products AS op
+                JOIN orders AS o ON op."orderId" = o.id
+                JOIN user_address AS ua ON o."addressId" = ua.id
+                WHERE ua."deliveryAreaId" = '${regionId}'
+            ) AS filtered_orders ON p.id = filtered_orders."productId"
+            WHERE filtered_orders."productId" IS NOT NULL
+          `);
+
+          return {
+            data: products,
+            total: count[0].total,
+            pageSize: 12,
+            current: page,
+          };
+        }
+      }
+    } else {
+      switch (sorting) {
+        case 'rating': {
+          const offset = (page - 1) * 12;
+          const sortOrder = ordering == Ordering.asc ? 'ASC' : 'DESC';
+          const products = await this.prismaService.$queryRawUnsafe(`
+            SELECT p.id, p.title_uz, p.title_ru, p."inStock", p.sold, p.active, COALESCE(ROUND(AVG(r.rate), 2), 0) AS totalRating
+            FROM products AS p
+            LEFT JOIN reviews AS r ON p.id = r."productId"
+            GROUP BY p.id
+            ORDER BY totalRating ${sortOrder}
+            LIMIT ${12} OFFSET ${offset}
+          `);
+
+          const total = await this.prismaService.products.count();
+          return {
+            data: products,
+            total,
+            pageSize: 12,
+            current: page,
+          };
+        }
+        case 'mostSold': {
+          const sortOrder = ordering == Ordering.asc ? 'asc' : 'desc';
+
+          const products = await this.prismaService.products.findMany({
+            orderBy: { sold: sortOrder },
+            skip: (page - 1) * 12,
+            take: 12,
+          });
+
+          const total = await this.prismaService.products.count();
+          return {
+            data: products,
+            total,
+            pageSize: 12,
+            current: page,
+          };
+        }
+      }
+    }
   }
 }
