@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseInterceptors,
 } from '@nestjs/common';
 import { AreasService } from './areas.service';
@@ -55,10 +54,10 @@ export class AreasController {
     return this.areasService.update(id, updateAreaDto);
   }
 
-  @ApiOperation({ summary: 'Delete Area' })
-  @ApiParam({ name: 'id' })
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.areasService.remove(id);
-  }
+  // @ApiOperation({ summary: 'Delete Area' })
+  // @ApiParam({ name: 'id' })
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.areasService.remove(id);
+  // }
 }

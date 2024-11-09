@@ -63,15 +63,9 @@ export class CategoriesController {
   @Get()
   @Public()
   @ApiOperation({ summary: 'Get all categories' })
-  @ApiQuery({ name: 'page', type: 'number', required: false })
-  @ApiQuery({ name: 'limit', type: 'number', required: false })
   @ApiQuery({ name: 'search', type: 'string', required: false })
-  findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-    @Query('search') search?: string,
-  ) {
-    return this.categoriesService.findAll(+page, +limit, search);
+  findAll(@Query('search') search?: string) {
+    return this.categoriesService.findAll(search);
   }
 
   @Get(':id')

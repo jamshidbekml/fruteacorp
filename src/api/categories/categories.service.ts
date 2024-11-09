@@ -16,7 +16,7 @@ export class CategoriesService {
     });
   }
 
-  async findAll(page: number, limit: number, search?: string) {
+  async findAll(search?: string) {
     const data = await this.prismaService.categories.findMany({
       ...(search
         ? {
@@ -38,8 +38,6 @@ export class CategoriesService {
             },
           }
         : {}),
-      skip: (page - 1) * limit,
-      take: limit,
     });
 
     const total = await this.prismaService.categories.count({
@@ -67,8 +65,6 @@ export class CategoriesService {
 
     return {
       data,
-      pageSize: limit,
-      current: page,
       total,
     };
   }
