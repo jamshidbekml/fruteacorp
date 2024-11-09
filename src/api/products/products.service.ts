@@ -102,9 +102,6 @@ export class ProductsService {
             }
           : {}),
         ...(categoryId ? { categoryId } : {}),
-        inStock: {
-          gte: 1,
-        },
         active: true,
       },
       select: {
@@ -146,9 +143,6 @@ export class ProductsService {
           : {}),
         ...(categoryId ? { categoryId } : {}),
         active: true,
-        inStock: {
-          gte: 1,
-        },
       },
     });
 
