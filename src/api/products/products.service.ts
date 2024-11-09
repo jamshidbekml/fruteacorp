@@ -191,14 +191,7 @@ export class ProductsService {
             }
           : {}),
       },
-      select: {
-        id: true,
-        title_ru: true,
-        title_uz: true,
-        amount: true,
-        discountAmount: true,
-        discountStatus: true,
-        discountExpiresAt: true,
+      include: {
         images: {
           where: { isMain: true },
           select: { image: { select: { name: true } }, isMain: true },
