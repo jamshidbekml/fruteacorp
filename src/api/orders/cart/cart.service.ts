@@ -57,10 +57,16 @@ export class CartService {
       throw new BadRequestException(
         `Mahsulot sotuvda mavjud emas yoki sotib bo'lindi!`,
       );
+
     const cart = await this.get(userId);
     const existItem = cart.items.find(
       (item) => item.productId === cartItemDto.productId,
     );
+
+    if (existItem.quantity + cartItemDto.count > product.inStock) {
+      throw new BadRequestException('Omborda yetarli emas!');
+    }
+
     const cartId = await this.prismaService.cart
       .findFirst({
         where: {
