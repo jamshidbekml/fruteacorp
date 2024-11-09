@@ -62,9 +62,9 @@ export class DashboardService {
   async getStatistics(fromDate?: Date, toDate?: Date) {
     // Default to the current month if no dates are provided
     const start =
-      fromDate || new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      fromDate ? new Date(fromDate) : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
     const end =
-      toDate ||
+      toDate ? new Date(toDate) :
       new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
 
     // Initialize an array to hold daily statistics
