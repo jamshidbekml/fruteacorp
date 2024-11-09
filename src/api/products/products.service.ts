@@ -102,8 +102,19 @@ export class ProductsService {
             }
           : {}),
         ...(categoryId ? { categoryId } : {}),
+        inStock: {
+          gte: 1,
+        },
+        active: true,
       },
-      include: {
+      select: {
+        id: true,
+        title_ru: true,
+        title_uz: true,
+        amount: true,
+        discountAmount: true,
+        discountStatus: true,
+        discountExpiresAt: true,
         images: {
           where: { isMain: true },
           select: { image: { select: { name: true } }, isMain: true },
@@ -134,6 +145,89 @@ export class ProductsService {
             }
           : {}),
         ...(categoryId ? { categoryId } : {}),
+        active: true,
+        inStock: {
+          gte: 1,
+        },
+      },
+    });
+
+    const products = [];
+
+    for await (const product of data) {
+      const stats = await this.prismaService.review.aggregate({
+        where: { productId: product.id },
+        _avg: { rate: true },
+        _count: { productId: true },
+      });
+
+      products.push({ ...product, rating: stats._avg, reviews: stats._count });
+    }
+
+    return { data: products, total, pageSize: limit, current: page };
+  }
+
+  async findAllForAdmin(page: number, limit: number, search?: string) {
+    if (limit > 50) throw new BadRequestException('limit must be less than 50');
+
+    const data = await this.prismaService.products.findMany({
+      where: {
+        ...(search
+          ? {
+              OR: [
+                {
+                  title_ru: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  title_uz: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+              ],
+            }
+          : {}),
+      },
+      select: {
+        id: true,
+        title_ru: true,
+        title_uz: true,
+        amount: true,
+        discountAmount: true,
+        discountStatus: true,
+        discountExpiresAt: true,
+        images: {
+          where: { isMain: true },
+          select: { image: { select: { name: true } }, isMain: true },
+        },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const total = await this.prismaService.products.count({
+      where: {
+        ...(search
+          ? {
+              OR: [
+                {
+                  title_ru: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  title_uz: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+              ],
+            }
+          : {}),
       },
     });
 
@@ -171,7 +265,7 @@ export class ProductsService {
               select: { id: true, firstName: true, lastName: true },
             },
             replies: true,
-            createdAt: true
+            createdAt: true,
           },
         },
       },
@@ -289,5 +383,57 @@ export class ProductsService {
     await this.prismaService.products.delete({ where: { id: product.id } });
 
     return 'Mahsulot muvaffaqiyatli o`chirildi!';
+  }
+
+  async mostSold(page: number, limit: number) {
+    if (limit > 50) throw new BadRequestException('limit must be less than 50');
+
+    const data = await this.prismaService.products.findMany({
+      where: {
+        inStock: {
+          gte: 1,
+        },
+        active: true,
+      },
+      select: {
+        id: true,
+        title_ru: true,
+        title_uz: true,
+        amount: true,
+        discountAmount: true,
+        discountStatus: true,
+        discountExpiresAt: true,
+        images: {
+          where: { isMain: true },
+          select: { image: { select: { name: true } }, isMain: true },
+        },
+      },
+      orderBy: { sold: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const total = await this.prismaService.products.count({
+      where: {
+        inStock: {
+          gte: 1,
+        },
+        active: true,
+      },
+    });
+
+    const products = [];
+
+    for await (const product of data) {
+      const stats = await this.prismaService.review.aggregate({
+        where: { productId: product.id },
+        _avg: { rate: true },
+        _count: { productId: true },
+      });
+
+      products.push({ ...product, rating: stats._avg, reviews: stats._count });
+    }
+
+    return { data: products, total, pageSize: limit, current: page };
   }
 }

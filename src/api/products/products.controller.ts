@@ -55,7 +55,30 @@ export class ProductsController {
     @Query('search') search?: string,
     @Query('categoryId') categoryId?: string,
   ) {
-    return this.productsService.findAll(page, limit, search, categoryId);
+    return this.productsService.findAll(+page, +limit, search, categoryId);
+  }
+
+  @Public()
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @Get()
+  findMostSold(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.productsService.mostSold(+page, +limit);
+  }
+
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @Get('/admin')
+  findAllForAdmin(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('search') search?: string,
+  ) {
+    return this.productsService.findAllForAdmin(+page, +limit, search);
   }
 
   @Public()
