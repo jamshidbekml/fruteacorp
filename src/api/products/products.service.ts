@@ -116,6 +116,7 @@ export class ProductsService {
           where: { isMain: true },
           select: { image: { select: { name: true } }, isMain: true },
         },
+        inStock: true,
       },
       skip: (page - 1) * limit,
       take: limit,
