@@ -56,4 +56,20 @@ export class DashboardController {
   ) {
     return this.dashboardService.products(sorting, ordering, +page, regionId);
   }
+
+  @Get('/user-orders')
+  @Roles(ROLE.superadmin)
+  @ApiOperation({ summary: 'Get user orders' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'fromDate', required: false })
+  @ApiQuery({ name: 'toDate', required: false })
+  getOrders(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Query('fromDate') fromDate?: Date,
+    @Query('toDate') toDate?: Date,
+  ) {
+    return this.dashboardService.userOrders(+page, +limit, fromDate, toDate);
+  }
 }

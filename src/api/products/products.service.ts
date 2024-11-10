@@ -273,6 +273,12 @@ export class ProductsService {
   async update(id: string, updateProductDto: UpdateProductDto) {
     const product = await this.findOne(id);
 
+    if (product.active && updateProductDto?.active === false) {
+      await this.prismaService.cartProduct.deleteMany({
+        where: { productId: id },
+      });
+    }
+
     const data = await this.prismaService.products.update({
       where: { id: id },
       data: {

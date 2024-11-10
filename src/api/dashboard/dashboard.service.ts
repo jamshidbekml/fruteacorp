@@ -61,11 +61,12 @@ export class DashboardService {
 
   async getStatistics(fromDate?: Date, toDate?: Date) {
     // Default to the current month if no dates are provided
-    const start =
-      fromDate ? new Date(fromDate) : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const end =
-      toDate ? new Date(toDate) :
-      new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
+    const start = fromDate
+      ? new Date(fromDate)
+      : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const end = toDate
+      ? new Date(toDate)
+      : new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
 
     // Initialize an array to hold daily statistics
     const dailyStatistics = [];
@@ -240,7 +241,7 @@ export class DashboardService {
         case 'rating': {
           const offset = (page - 1) * 12;
           const sortOrder = ordering == Ordering.asc ? 'ASC' : 'DESC';
-          const products = await this.prismaService.$queryRawUnsafe(`
+          const products = await this.prismaService.$queryRaw`
             SELECT p.id, p.title_uz, p.title_ru, p."inStock", p.sold, p.active, COALESCE(ROUND(AVG(r.rate), 2), 0) AS totalRating
             FROM products AS p
             LEFT JOIN (
@@ -255,9 +256,9 @@ export class DashboardService {
             GROUP BY p.id
             ORDER BY totalRating ${sortOrder}
             LIMIT ${12} OFFSET ${offset}
-          `);
+          `;
 
-          const count = await this.prismaService.$queryRawUnsafe(`
+          const count = await this.prismaService.$queryRaw`
             SELECT CAST(COUNT(DISTINCT p.id) AS INT) AS total
             FROM products AS p
             LEFT JOIN (
@@ -268,7 +269,7 @@ export class DashboardService {
                 WHERE ua."deliveryAreaId" = '${regionId}'
             ) AS filtered_orders ON p.id = filtered_orders."productId"
             WHERE filtered_orders."productId" IS NOT NULL
-          `);
+          `;
 
           return {
             data: products,
@@ -280,7 +281,7 @@ export class DashboardService {
         case 'mostSold': {
           const offset = (page - 1) * 12;
           const sortOrder = ordering == Ordering.asc ? 'ASC' : 'DESC';
-          const products = await this.prismaService.$queryRawUnsafe(`
+          const products = await this.prismaService.$queryRaw`
             SELECT p.id, p.title_uz, p.title_ru, p."inStock", p.sold, p.active, COALESCE(ROUND(AVG(r.rate), 2), 0) AS totalRating
             FROM products AS p
             LEFT JOIN (
@@ -295,9 +296,9 @@ export class DashboardService {
             GROUP BY p.id
             ORDER BY p.sold ${sortOrder}
             LIMIT ${12} OFFSET ${offset}
-          `);
+          `;
 
-          const count = await this.prismaService.$queryRawUnsafe(`
+          const count = await this.prismaService.$queryRaw`
             SELECT CAST(COUNT(DISTINCT p.id) AS INT) AS total
             FROM products AS p
             LEFT JOIN (
@@ -308,7 +309,7 @@ export class DashboardService {
                 WHERE ua."deliveryAreaId" = '${regionId}'
             ) AS filtered_orders ON p.id = filtered_orders."productId"
             WHERE filtered_orders."productId" IS NOT NULL
-          `);
+          `;
 
           return {
             data: products,
@@ -323,14 +324,14 @@ export class DashboardService {
         case 'rating': {
           const offset = (page - 1) * 12;
           const sortOrder = ordering == Ordering.asc ? 'ASC' : 'DESC';
-          const products = await this.prismaService.$queryRawUnsafe(`
+          const products = await this.prismaService.$queryRaw`
             SELECT p.id, p.title_uz, p.title_ru, p."inStock", p.sold, p.active, COALESCE(ROUND(AVG(r.rate), 2), 0) AS totalRating
             FROM products AS p
             LEFT JOIN reviews AS r ON p.id = r."productId"
             GROUP BY p.id
             ORDER BY totalRating ${sortOrder}
             LIMIT ${12} OFFSET ${offset}
-          `);
+          `;
 
           const total = await this.prismaService.products.count();
           return {
@@ -359,5 +360,80 @@ export class DashboardService {
         }
       }
     }
+  }
+
+  async userOrders(
+    page: number,
+    limit: number,
+    fromDate?: Date,
+    toDate?: Date,
+  ) {
+    const start = fromDate
+      ? new Date(fromDate)
+      : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const end = toDate
+      ? new Date(toDate)
+      : new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
+
+    const users = await this.prismaService.$queryRaw`
+      WITH product_details AS (
+        SELECT 
+          op."orderId",
+          jsonb_build_object(
+            'productId', op."productId",
+            'title_uz', op.title_uz,
+            'title_ru', op.title_ru,
+            'quantity', op.quantity,
+            'amount', op.amount
+          ) AS product
+        FROM order_products AS op
+      )
+      SELECT 
+        u.id,
+        u."firstName",
+        u."lastName",
+        u.role,
+        u.phone,
+        CAST(COUNT(o.id) AS INT) AS orderCount,
+        COALESCE(
+          array_agg(
+            jsonb_build_object(
+              'orderId', o.id,
+              'status', o.status,
+              'totalAmount', o."totalAmount",
+              'createdAt', o."createdAt",
+              'deliveryPrice', o."deliveryPrice",
+              'products', 
+              COALESCE(
+                (SELECT jsonb_agg(pd.product) FROM product_details pd WHERE pd."orderId" = o.id), 
+                '[]'::jsonb
+              )
+            )
+          ) FILTER (WHERE o.id IS NOT NULL), ARRAY[]::jsonb[]
+        ) AS orders
+      FROM users AS u
+      LEFT JOIN orders AS o
+        ON o."userId" = u.id
+        AND o."createdAt" BETWEEN ${start} AND ${end}
+        AND o.status IN ('paid', 'onway', 'delivered')
+      LEFT JOIN order_products AS op
+        ON op."orderId" = o.id
+      GROUP BY u.id, u."firstName", u."lastName", u."phone"
+      ORDER BY orderCount DESC
+      LIMIT ${limit} OFFSET ${(page - 1) * limit};
+    `;
+
+    const count = await this.prismaService.$queryRaw`
+      SELECT 
+        CAST(COUNT(DISTINCT u.id) AS INT) AS total
+        FROM users AS u
+    `;
+
+    return {
+      data: users,
+      total: count[0].total,
+      pageSize: limit,
+      current: page,
+    };
   }
 }

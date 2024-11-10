@@ -15,13 +15,22 @@ export class CartService {
         products: {
           include: {
             Product: {
-              include: {
+              select: {
                 images: {
                   where: { isMain: true },
                   select: {
                     image: { select: { name: true, id: true } },
                   },
                 },
+                id: true,
+                title_uz: true,
+                title_ru: true,
+                amount: true,
+                discountAmount: true,
+                discountStatus: true,
+                discountExpiresAt: true,
+                inStock: true,
+                sold: true,
               },
             },
           },
@@ -116,7 +125,8 @@ export class CartService {
       (item) => item.productId === body.productId,
     );
 
-    if (!existItem) throw new Error('Savatda bu mahsulot mavjud emas!');
+    if (!existItem)
+      throw new BadRequestException('Savatda bu mahsulot mavjud emas!');
 
     if (existItem.quantity > (body?.count || 1)) {
       await this.prismaService.cartProduct.update({
