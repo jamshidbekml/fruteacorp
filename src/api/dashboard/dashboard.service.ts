@@ -241,7 +241,7 @@ export class DashboardService {
         case 'rating': {
           const offset = (page - 1) * 12;
           const sortOrder = ordering == Ordering.asc ? 'ASC' : 'DESC';
-          const products = await this.prismaService.$queryRaw`
+          const products = await this.prismaService.$queryRawUnsafe(`
             SELECT p.id, p.title_uz, p.title_ru, p."inStock", p.sold, p.active, COALESCE(ROUND(AVG(r.rate), 2), 0) AS totalRating
             FROM products AS p
             LEFT JOIN (
@@ -256,9 +256,9 @@ export class DashboardService {
             GROUP BY p.id
             ORDER BY totalRating ${sortOrder}
             LIMIT ${12} OFFSET ${offset}
-          `;
+          `);
 
-          const count = await this.prismaService.$queryRaw`
+          const count = await this.prismaService.$queryRawUnsafe(`
             SELECT CAST(COUNT(DISTINCT p.id) AS INT) AS total
             FROM products AS p
             LEFT JOIN (
@@ -269,7 +269,7 @@ export class DashboardService {
                 WHERE ua."deliveryAreaId" = '${regionId}'
             ) AS filtered_orders ON p.id = filtered_orders."productId"
             WHERE filtered_orders."productId" IS NOT NULL
-          `;
+          `);
 
           return {
             data: products,
@@ -281,7 +281,7 @@ export class DashboardService {
         case 'mostSold': {
           const offset = (page - 1) * 12;
           const sortOrder = ordering == Ordering.asc ? 'ASC' : 'DESC';
-          const products = await this.prismaService.$queryRaw`
+          const products = await this.prismaService.$queryRawUnsafe(`
             SELECT p.id, p.title_uz, p.title_ru, p."inStock", p.sold, p.active, COALESCE(ROUND(AVG(r.rate), 2), 0) AS totalRating
             FROM products AS p
             LEFT JOIN (
@@ -296,9 +296,9 @@ export class DashboardService {
             GROUP BY p.id
             ORDER BY p.sold ${sortOrder}
             LIMIT ${12} OFFSET ${offset}
-          `;
+          `);
 
-          const count = await this.prismaService.$queryRaw`
+          const count = await this.prismaService.$queryRawUnsafe(`
             SELECT CAST(COUNT(DISTINCT p.id) AS INT) AS total
             FROM products AS p
             LEFT JOIN (
@@ -309,7 +309,7 @@ export class DashboardService {
                 WHERE ua."deliveryAreaId" = '${regionId}'
             ) AS filtered_orders ON p.id = filtered_orders."productId"
             WHERE filtered_orders."productId" IS NOT NULL
-          `;
+          `);
 
           return {
             data: products,
@@ -324,14 +324,14 @@ export class DashboardService {
         case 'rating': {
           const offset = (page - 1) * 12;
           const sortOrder = ordering == Ordering.asc ? 'ASC' : 'DESC';
-          const products = await this.prismaService.$queryRaw`
+          const products = await this.prismaService.$queryRawUnsafe(`
             SELECT p.id, p.title_uz, p.title_ru, p."inStock", p.sold, p.active, COALESCE(ROUND(AVG(r.rate), 2), 0) AS totalRating
             FROM products AS p
             LEFT JOIN reviews AS r ON p.id = r."productId"
             GROUP BY p.id
             ORDER BY totalRating ${sortOrder}
             LIMIT ${12} OFFSET ${offset}
-          `;
+          `);
 
           const total = await this.prismaService.products.count();
           return {

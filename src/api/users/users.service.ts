@@ -99,6 +99,11 @@ export class UsersService {
             id: true,
           },
           orderBy: { createdAt: 'desc' },
+          where: {
+            status: {
+              in: ['paid', 'onway', 'delivered'],
+            },
+          },
         },
         subscriptions: {
           orderBy: { createdAt: 'desc' },
