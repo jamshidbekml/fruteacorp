@@ -1,4 +1,10 @@
-import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Query,
+  UseInterceptors,
+} from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import {
   ApiBearerAuth,
@@ -54,6 +60,8 @@ export class DashboardController {
     @Query('page') page = 1,
     @Query('regionId') regionId?: string,
   ) {
+    if (!sorting || !ordering) throw new BadRequestException();
+
     return this.dashboardService.products(sorting, ordering, +page, regionId);
   }
 
