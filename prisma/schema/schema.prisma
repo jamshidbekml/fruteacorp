@@ -26,7 +26,7 @@ model Otps {
   code      String   @default("00000")
   type      OTP_TYPE @default(web)
   userId    String   @db.Uuid
-  user      Users    @relation(fields: [userId], references: [id])
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -1,18 +1,21 @@
 model Users {
-    id            String             @id @default(uuid()) @db.Uuid
-    firstName     String
-    lastName      String
-    phone         String             @unique
-    password      String
-    refreshToken  String?
-    telegramId    String?            @unique
-    role          ROLE               @default(user)
-    orders        Orders[]
-    otps          Otps[]
-    promocodes    UserPromocodes[]
-    subscriptions UserSubscription[]
-    addresses     UserAddress[]
-    reviews       Review[]
+    id             String             @id @default(uuid()) @db.Uuid
+    firstName      String
+    lastName       String
+    phone          String             @unique
+    password       String
+    refreshToken   String?
+    telegramId     String?            @unique
+    verified       Boolean            @default(false)
+    role           ROLE               @default(user)
+    orders         Orders[]           @relation("userOrders")
+    OperatorOrders Orders[]           @relation("operatorOrders")
+    PackmanOrders  Orders[]           @relation("packmanOrders")
+    otps           Otps[]
+    promocodes     UserPromocodes[]
+    subscriptions  UserSubscription[]
+    addresses      UserAddress[]
+    reviews        Review[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

@@ -1,23 +1,28 @@
 model Orders {
-    id             String         @id @default(uuid()) @db.Uuid
-    userId         String?        @db.Uuid
-    totalAmount    Decimal        @default(0) @db.Decimal(10, 2)
-    discountAmount Decimal        @default(0) @db.Decimal(10, 2)
-    amount         Decimal        @default(0) @db.Decimal(10, 2)
-    deliveryPrice  Decimal        @default(0) @db.Decimal(10, 2)
-    status         ORDER_STATUS   @default(created)
-    type           ORDER_TYPE     @default(product)
+    id             String       @id @default(uuid()) @db.Uuid
+    userId         String?      @db.Uuid
+    totalAmount    Decimal      @default(0) @db.Decimal(10, 2)
+    discountAmount Decimal      @default(0) @db.Decimal(10, 2)
+    amount         Decimal      @default(0) @db.Decimal(10, 2)
+    deliveryPrice  Decimal      @default(0) @db.Decimal(10, 2)
+    status         ORDER_STATUS @default(created)
+    type           ORDER_TYPE   @default(product)
     paymentType    PAYMENT_TYPE
-    addressId      String?        @db.Uuid
+    addressId      String?      @db.Uuid
     deliveryInfo   String?
     extraInfo      String?
-    createdAt      DateTime       @default(now())
-    updatedAt      DateTime       @updatedAt
-    User           Users?         @relation(fields: [userId], references: [id], onDelete: SetNull)
-    Address        UserAddress?   @relation(fields: [addressId], references: [id], onDelete: SetNull)
-    items          OrderProduct[]
-    Transaction    Transactions[]
-    Reviews        Review[]
+    createdAt      DateTime     @default(now())
+    updatedAt      DateTime     @updatedAt
+    operatorId     String?      @db.Uuid
+    packmanId      String?      @db.Uuid
+    User           Users?       @relation("userOrders", fields: [userId], references: [id], onDelete: SetNull)
+    Operator       Users?       @relation("operatorOrders", fields: [operatorId], references: [id], onDelete: SetNull)
+    Packman        Users?       @relation("packmanOrders", fields: [packmanId], references: [id], onDelete: SetNull)
+
+    Address     UserAddress?   @relation(fields: [addressId], references: [id], onDelete: SetNull)
+    items       OrderProduct[]
+    Transaction Transactions[]
+    Reviews     Review[]
 
     @@map("orders")
 }
