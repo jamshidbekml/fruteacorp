@@ -60,8 +60,11 @@ export class DashboardController {
     @Query('page') page = 1,
     @Query('regionId') regionId?: string,
   ) {
-    if (!sorting || !ordering) throw new BadRequestException();
-
+    if (
+      ![Sorting.rating, Sorting.mostSold].includes(sorting) ||
+      ![Ordering.asc, Ordering.desc].includes(ordering)
+    )
+      throw new BadRequestException();
     return this.dashboardService.products(sorting, ordering, +page, regionId);
   }
 
