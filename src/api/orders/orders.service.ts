@@ -181,6 +181,20 @@ export class OrdersService {
             phone: true,
           },
         },
+        Operator: {
+          select: {
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+        Packman: {
+          select: {
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
         Address: {
           select: {
             streetName: true,
