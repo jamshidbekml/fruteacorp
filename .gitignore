@@ -4,7 +4,7 @@
 /build
 
 #migrations
-/prisma/migrations/*
+# /prisma/migrations/*
 
 #uploads
 /uploads/temp/*
