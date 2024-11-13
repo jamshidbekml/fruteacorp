@@ -97,6 +97,23 @@ export class CategoriesService {
       include: {
         products: true,
         childCategories: true,
+        parent: {
+          include: {
+            parent: {
+              include: {
+                parent: {
+                  include: {
+                    parent: {
+                      include: {
+                        parent: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
