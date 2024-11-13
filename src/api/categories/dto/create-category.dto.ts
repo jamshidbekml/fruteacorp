@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsDefined,
   IsNotEmpty,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -23,4 +24,9 @@ export class CreateCategoryDto {
   @Type(() => TitleDto)
   @IsNotEmpty()
   title: TitleDto;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  parentId?: string;
 }

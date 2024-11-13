@@ -6,5 +6,9 @@ model Categories {
   updatedAt DateTime   @updatedAt
   products  Products[]
 
+  parentId   String?       @db.Uuid
+  parent     Categories?   @relation("CategoryParent", fields: [parentId], references: [id], onDelete: Cascade)
+  children   Categories[]  @relation("CategoryParent")
+
   @@map("categories")
 }

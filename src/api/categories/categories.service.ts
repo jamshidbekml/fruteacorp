@@ -12,6 +12,7 @@ export class CategoriesService {
       data: {
         title_ru: createCategoryDto.title.ru,
         title_uz: createCategoryDto.title.uz,
+        parentId: createCategoryDto.parentId || null,
       },
     });
   }
@@ -38,6 +39,9 @@ export class CategoriesService {
             },
           }
         : {}),
+      include: {
+        children: true,
+      },
     });
 
     const total = await this.prismaService.categories.count({
@@ -74,6 +78,7 @@ export class CategoriesService {
       where: { id },
       include: {
         products: true,
+        children: true,
       },
     });
 
@@ -89,6 +94,7 @@ export class CategoriesService {
       data: {
         title_ru: updateCategoryDto.title.ru,
         title_uz: updateCategoryDto.title.uz,
+        parentId: updateCategoryDto.parentId || null,
       },
     });
   }
