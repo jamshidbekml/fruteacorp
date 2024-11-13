@@ -19,7 +19,7 @@ model UserAddress {
     lat            String
     long           String
     deliveryAreaId String   @db.Uuid
-    deliveryArea   Areas    @relation(fields: [deliveryAreaId], references: [id])
+    deliveryArea   Areas    @relation(fields: [deliveryAreaId], references: [id], onDelete: Cascade)
     houseEntryCode String?
     houseLine      String?
     houseNumber    String?
