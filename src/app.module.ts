@@ -1,10 +1,11 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ApiModule } from './api/api.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { BotService } from './bot/bot.service';
+import { BotModule } from './bot/bot.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -19,13 +20,8 @@ import { BotService } from './bot/bot.service';
       serveRoot: '/temp/images',
     }),
     ApiModule,
+    BotModule,
   ],
-  providers: [BotService],
+  controllers: [AppController],
 })
-export class AppModule implements OnModuleInit {
-  constructor(private readonly botService: BotService) {}
-
-  async onModuleInit() {
-    // await this.botService.launch();
-  }
-}
+export class AppModule {}

@@ -1,10 +1,12 @@
 import { Keyboard } from 'grammy';
+import messages from './messages';
 
 const Keyboards = {
-  packman_menu: new Keyboard()
-    .text(`Yetkazilgan buyurtmalar`)
-    .text(`Qabul qilingan buyurtmalar`)
+  main_menu: new Keyboard()
+    .text(messages.orders)
+    .text(messages.profile)
     .resized(),
+  contact: new Keyboard().requestContact('Share Contact').resized(),
 };
 
 export default Keyboards;

@@ -60,12 +60,18 @@ export class OrdersService {
     }
 
     const promo = createOrderDto.promoCodeId
-      ? await this.prismaService.promoCodes.findUnique({
-          where: { id: createOrderDto.promoCodeId },
-          select: {
-            discount: true,
-          },
-        })
+      ? await this.prismaService.promoCodes
+          .findUnique({
+            where: { id: createOrderDto.promoCodeId },
+            select: {
+              discount: true,
+            },
+          })
+          .then((data) => {
+            return {
+              discount: (amount * data.discount) / 100,
+            };
+          })
       : { discount: 0 };
 
     const address = await this.prismaService.userAddress.findUnique({
@@ -77,7 +83,9 @@ export class OrdersService {
 
     const deliveryPrice = address.deliveryArea.freeDelivery
       ? 0
-      : Number(address.deliveryArea.deliveryPrice);
+      : Number(address.deliveryArea.freeDeliveryFrom) <= amount
+        ? 0
+        : Number(address.deliveryArea.deliveryPrice);
 
     amount = amount + deliveryPrice;
 

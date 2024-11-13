@@ -42,6 +42,16 @@ export class CreateAreaDto implements Partial<Areas> {
   deliveryPrice: Decimal;
 
   @ApiProperty({
+    description: 'Delivery price',
+    required: true,
+    type: 'number',
+  })
+  @IsDefined()
+  @IsNotEmpty()
+  @IsNumber()
+  freeDeliveryFrom: Decimal;
+
+  @ApiProperty({
     description: 'Free delivery (default: false)',
     required: false,
     type: 'boolean',

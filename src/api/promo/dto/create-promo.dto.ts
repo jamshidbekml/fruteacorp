@@ -8,7 +8,9 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
   MaxLength,
+  Min,
 } from 'class-validator';
 
 export class CreatePromoDto implements Partial<PromoCodes> {
@@ -45,6 +47,8 @@ export class CreatePromoDto implements Partial<PromoCodes> {
   @IsDefined()
   @IsNotEmpty()
   @IsNumber()
+  @Min(1)
+  @Max(100)
   discount: number;
 
   @ApiProperty({

@@ -8,6 +8,7 @@ import { ClickRequestBody } from './types/incoming-request-body';
 import { PrismaService } from '../prisma/prisma.service';
 import { GenerateMd5HashParams } from './interfaces/generate-prepare-hash.interface';
 import { createHash } from 'node:crypto';
+import { MyBot } from 'src/bot/bot';
 
 @Injectable()
 export class ClickService {
@@ -16,6 +17,7 @@ export class ClickService {
   constructor(
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
+    private readonly botService: MyBot,
   ) {
     this.secretKey = this.configService.get<string>('SECRET_KEY');
   }
@@ -194,6 +196,8 @@ export class ClickService {
         status: 'paid',
       },
     });
+
+    this.botService.sendOrderToOperators(order.id);
 
     await this.prismaService.cart.deleteMany({
       where: {
