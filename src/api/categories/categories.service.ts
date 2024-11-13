@@ -19,9 +19,10 @@ export class CategoriesService {
 
   async findAll(search?: string) {
     const data = await this.prismaService.categories.findMany({
-      ...(search
-        ? {
-            where: {
+      where: {
+        parentId: null,
+        ...(search
+          ? {
               OR: [
                 {
                   title_ru: {
@@ -36,9 +37,9 @@ export class CategoriesService {
                   },
                 },
               ],
-            },
-          }
-        : {}),
+            }
+          : {}),
+      },
       include: {
         children: {
           include: {
@@ -58,15 +59,13 @@ export class CategoriesService {
           },
         },
       },
-      where: {
-        parentId: null,
-      },
     });
 
     const total = await this.prismaService.categories.count({
-      ...(search
-        ? {
-            where: {
+      where: {
+        parentId: null,
+        ...(search
+          ? {
               OR: [
                 {
                   title_ru: {
@@ -81,9 +80,9 @@ export class CategoriesService {
                   },
                 },
               ],
-            },
-          }
-        : {}),
+            }
+          : {}),
+      },
     });
 
     return {
