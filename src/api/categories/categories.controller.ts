@@ -53,6 +53,9 @@ export class CategoriesController {
           },
           required: ['uz', 'ru'],
         },
+        parentId: {
+          type: 'string',
+        },
       },
     },
   })
