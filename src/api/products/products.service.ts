@@ -256,6 +256,27 @@ export class ProductsService {
             createdAt: true,
           },
         },
+        category: {
+          include: {
+            parent: {
+              include: {
+                parent: {
+                  include: {
+                    parent: {
+                      include: {
+                        parent: {
+                          include: {
+                            parent: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
