@@ -11,6 +11,6 @@ export class BotModule implements OnModuleInit {
   constructor(private readonly botService: MyBot) {}
 
   async onModuleInit() {
-    await this.botService.launch();
+    // await this.botService.launch();
   }
 }
