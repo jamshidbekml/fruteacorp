@@ -17,8 +17,8 @@ export class ProductsService {
         data: {
           title_ru: createProductDto.title_ru,
           title_uz: createProductDto.title_uz,
-          description_ru: createProductDto.description_ru,
-          description_uz: createProductDto.description_uz,
+          description_ru: createProductDto?.description_ru,
+          description_uz: createProductDto?.description_uz,
           categoryId: createProductDto.categoryId,
           amount: createProductDto?.amount,
           active: createProductDto?.active,

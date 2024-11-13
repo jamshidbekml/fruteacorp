@@ -82,40 +82,40 @@ export class CreateProductDto implements Partial<Products> {
     required: true,
     type: 'string',
   })
-  @IsDefined()
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  description_ru: string;
+  description_ru?: string;
 
   @ApiProperty({
     description: `Field to enter product's description`,
     required: true,
     type: 'string',
   })
-  @IsDefined()
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  description_uz: string;
+  description_uz?: string;
 
   @ApiProperty({
     description: `Field to enter product's description`,
     required: true,
     type: 'string',
   })
-  @IsDefined()
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  extraInfoUz: string;
+  extraInfoUz?: string;
 
   @ApiProperty({
     description: `Field to enter product's description`,
     required: true,
     type: 'string',
   })
-  @IsDefined()
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  extraInfoRu: string;
+  extraInfoRu?: string;
 
   @ApiProperty({
     description: `Field to enter product's status`,
