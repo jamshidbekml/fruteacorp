@@ -95,7 +95,6 @@ export class CategoriesService {
     const data = await this.prismaService.categories.findUnique({
       where: { id },
       include: {
-        products: true,
         childCategories: true,
         parent: {
           include: {
@@ -137,10 +136,18 @@ export class CategoriesService {
   async remove(id: string) {
     const category = await this.findOne(id);
 
-    if (category.products.length > 0)
+    const withProducts = await this.prismaService.categories.findUnique({
+      where: {
+        id: category.id,
+      },
+      select: {
+        products: true,
+      },
+    });
+
+    if (withProducts.products.length > 0)
       throw new NotFoundException("Kategoriyani o'chirish imkoni yo'q!");
 
-    await this.prismaService.categories.delete({ where: { id: category.id } });
     return 'Kategoriya muvaffaqiyatli o`chirildi!';
   }
 }
