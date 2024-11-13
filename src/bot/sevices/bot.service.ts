@@ -8,7 +8,7 @@ import messages from '../assets/messages';
 export default class BotService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getUserOrders(chatId: number, ctx: any) {
+  async getUserOrders(chatId: number, ctx: any, page?: number) {
     const user = await this.prismaService.users.findUnique({
       where: {
         telegramId: String(chatId),
@@ -20,6 +20,58 @@ export default class BotService {
         where: {
           operatorId: user.id,
         },
+        select: {
+          User: {
+            select: {
+              firstName: true,
+              lastName: true,
+              phone: true,
+            },
+          },
+          status: true,
+        },
+        take: 5,
+        skip: page ? (page - 1) * 5 : 0,
+      });
+
+      const orderCounts = await this.prismaService.orders.groupBy({
+        by: ['operatorStatus'],
+        where: {
+          operatorId: user.id,
+        },
+        _count: {
+          id: true,
+        },
+      });
+
+      console.log(orderCounts);
+
+      const total = await this.prismaService.orders.count({
+        where: {
+          operatorId: user.id,
+        },
+      });
+
+      const received =
+        orderCounts.length > 0
+          ? orderCounts.find((item) => item.operatorStatus === 'received')
+            ? orderCounts.find((item) => item.operatorStatus === 'received')
+                ._count.id
+            : 0
+          : 0;
+
+      const confirmed =
+        orderCounts.length > 0
+          ? orderCounts.find((item) => item.operatorStatus === 'confirmed')
+            ? orderCounts.find((item) => item.operatorStatus === 'confirmed')
+                ._count.id
+            : 0
+          : 0;
+
+      console.log({
+        received,
+        confirmed,
+        total,
       });
     } else if (user.role === 'packman') {
     }
@@ -49,6 +101,7 @@ export default class BotService {
         telegramId: String(chatId),
       },
     });
+
     const order = await this.prismaService.orders.findUnique({
       where: { id: orderId },
       select: {
@@ -65,6 +118,7 @@ export default class BotService {
       where: { id: orderId },
       data: {
         operatorId: user.id,
+        operatorStatus: 'received',
       },
     });
 

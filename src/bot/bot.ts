@@ -222,10 +222,11 @@ export class MyBot {
           where: { telegramId: String(ctx.from.id) },
         });
 
-        if (user && user.verified)
+        if (user && user.verified) {
           return ctx.reply(messages.main_menu, {
             reply_markup: Keyboards.main_menu,
           });
+        } else await next();
       } else {
         await next();
       }

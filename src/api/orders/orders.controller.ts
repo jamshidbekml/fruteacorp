@@ -72,7 +72,7 @@ export class OrdersController {
   }
 
   @Patch(':id')
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Buyurtma o`zgartirish' })
   @ApiParam({ name: 'id', type: 'string', required: true })
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {

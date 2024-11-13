@@ -13,7 +13,7 @@ export class AppController {
   async getHello() {
     console.log('hello');
     this.botService.sendOrderToOperators(
-      '09f2c566-3f22-42b0-88be-6ca2987439f1',
+      '2a1ed21c-9cd7-471e-8d06-ae5c61191e72',
     );
   }
 }

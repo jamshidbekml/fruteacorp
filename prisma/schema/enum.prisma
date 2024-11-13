@@ -7,6 +7,17 @@ enum ORDER_STATUS {
     delivered
 }
 
+enum ORDER_OPERATOR_STATUS {
+    received
+    confirmed
+}
+
+enum ORDER_PACKMAN_STATUS {
+    received
+    onway
+    delivered
+}
+
 enum TRANSACTION_STATUS {
     pending
     paid
