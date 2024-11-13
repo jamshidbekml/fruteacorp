@@ -41,15 +41,15 @@ export class CategoriesService {
           : {}),
       },
       include: {
-        children: {
+        childCategories: {
           include: {
-            children: {
+            childCategories: {
               include: {
-                children: {
+                childCategories: {
                   include: {
-                    children: {
+                    childCategories: {
                       include: {
-                        children: true,
+                        childCategories: true,
                       },
                     },
                   },
@@ -96,7 +96,7 @@ export class CategoriesService {
       where: { id },
       include: {
         products: true,
-        children: true,
+        childCategories: true,
       },
     });
 
