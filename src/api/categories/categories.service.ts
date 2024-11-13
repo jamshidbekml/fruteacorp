@@ -40,7 +40,26 @@ export class CategoriesService {
           }
         : {}),
       include: {
-        children: true,
+        children: {
+          include: {
+            children: {
+              include: {
+                children: {
+                  include: {
+                    children: {
+                      include: {
+                        children: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      where: {
+        parentId: null,
       },
     });
 
