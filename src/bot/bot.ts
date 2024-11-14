@@ -37,6 +37,7 @@ export class MyBot {
 
   private setupCommands() {
     this.bot.command('start', async (ctx) => {
+      console.log(ctx.message);
       await ctx.reply(messages.first_message, {
         reply_markup: Keyboards.contact,
         parse_mode: 'HTML',
@@ -52,19 +53,23 @@ export class MyBot {
       return await this.botService.sendUserdata(chat_id, ctx);
     });
 
-    this.bot.hears(messages.orders, async (ctx) => {
-      ctx['session'].step = 'idle';
-
-      const chat_id = ctx.msg.chat.id;
-
-      return await this.botService.getUserOrders(chat_id, ctx);
-    });
-
     this.bot.on('callback_query:data', async (ctx) => {
       const command = ctx.callbackQuery.data.split('?')[0];
 
       switch (command) {
         case 'confirm_operator': {
+          try {
+            const orderId = ctx.callbackQuery.data.split('=')[1];
+            return await this.botService.setOrderToOperator(
+              orderId,
+              ctx.callbackQuery.from.id,
+              ctx,
+            );
+          } catch (err) {
+            console.log(err);
+          }
+        }
+        case 'confirm_packman': {
           try {
             const orderId = ctx.callbackQuery.data.split('=')[1];
             return await this.botService.setOrderToOperator(
@@ -217,19 +222,28 @@ export class MyBot {
     this.bot.use(this.router);
 
     this.bot.use(async (ctx, next) => {
-      if (ctx.message?.text && ctx.message.text === '/start') {
-        const user = await this.prismaService.users.findUnique({
-          where: { telegramId: String(ctx.from.id) },
-        });
+      const user = await this.prismaService.users.findUnique({
+        where: {
+          telegramId: String(ctx.from.id),
+          role: { in: ['operator', 'packman'] },
+        },
+      });
 
-        if (user && user.verified) {
-          return ctx.reply(messages.main_menu, {
-            reply_markup: Keyboards.main_menu,
-          });
-        } else await next();
-      } else {
-        await next();
+      if (!user) {
+        ctx['session'].step = 'send-sms';
+
+        return await ctx.reply(messages.first_message, {
+          reply_markup: Keyboards.contact,
+          parse_mode: 'HTML',
+        });
       }
+
+      const orderId = ctx.message.text.split(' ')[1];
+
+      if (orderId)
+        return await this.sendLocationToPackman(orderId, ctx.message.chat.id);
+
+      await next();
     });
 
     this.bot.use(async (ctx, next) => {
@@ -256,12 +270,12 @@ export class MyBot {
   }
 
   public async launch() {
-    await this.bot.api.setMyCommands([
-      {
-        command: 'start',
-        description: 'Start the bot',
-      },
-    ]);
+    // await this.bot.api.setMyCommands([
+    //   {
+    //     command: 'start',
+    //     description: 'Start the bot',
+    //   },
+    // ]);
 
     this.bot.start();
   }
@@ -321,6 +335,121 @@ export class MyBot {
           );
         }
       }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async sendOrderToPackmans(orderId: string) {
+    try {
+      const order = await this.prismaService.orders.findUnique({
+        where: { id: orderId },
+        select: {
+          items: {
+            select: {
+              title_ru: true,
+              quantity: true,
+            },
+          },
+          User: {
+            select: {
+              firstName: true,
+              lastName: true,
+              phone: true,
+            },
+          },
+          status: true,
+          createdAt: true,
+          Address: {
+            select: {
+              streetName: true,
+              deliveryArea: {
+                select: {
+                  areaRU: true,
+                },
+              },
+              lat: true,
+              long: true,
+            },
+          },
+        },
+      });
+
+      if (order) {
+        const packmans = await this.prismaService.users.findMany({
+          where: {
+            role: 'packman',
+            verified: true,
+            telegramId: {
+              not: null,
+            },
+          },
+        });
+
+        for await (const packman of packmans) {
+          await this.bot.api.sendLocation(
+            packman.telegramId,
+            +order.Address.lat,
+            +order.Address.long,
+          );
+
+          await this.bot.api.sendMessage(
+            packman.telegramId,
+            messages.order_data(order),
+            {
+              parse_mode: 'HTML',
+              reply_markup: InlineKeyboards.confirm_order_packman(orderId),
+            },
+          );
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async sendLocationToPackman(orderId: string, chatId: number) {
+    try {
+      const order = await this.prismaService.orders.findUnique({
+        where: { id: orderId },
+        select: {
+          items: {
+            select: {
+              title_ru: true,
+              quantity: true,
+            },
+          },
+          User: {
+            select: {
+              firstName: true,
+              lastName: true,
+              phone: true,
+            },
+          },
+          status: true,
+          createdAt: true,
+          Address: {
+            select: {
+              streetName: true,
+              deliveryArea: {
+                select: {
+                  areaRU: true,
+                },
+              },
+              lat: true,
+              long: true,
+            },
+          },
+        },
+      });
+
+      if (order) {
+        await this.bot.api.sendLocation(
+          chatId,
+          +order.Address.lat,
+          +order.Address.long,
+        );
+      } else this.bot.api.sendMessage(chatId, `Bunday buyurtma topilmadi 😔`);
     } catch (err) {
       console.log(err);
     }

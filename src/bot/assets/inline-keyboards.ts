@@ -6,10 +6,11 @@ const InlineKeyboards = {
       '📥 Qabul qilish',
       `confirm_operator?order_id=${id}`,
     ),
-  confirm_order_packman: new InlineKeyboard().text(
-    '📥 Qabul qilish',
-    'confirm_packman',
-  ),
+  confirm_order_packman: (id: string) =>
+    new InlineKeyboard().text(
+      '📥 Qabul qilish',
+      `confirm_packman?order_id=${id}`,
+    ),
 };
 
 export default InlineKeyboards;

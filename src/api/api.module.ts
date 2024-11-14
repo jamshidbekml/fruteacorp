@@ -21,6 +21,8 @@ import { AreasModule } from './areas/areas.module';
 import { ReviewModule } from './review/review.module';
 import { ClickModule } from './click/click.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { OperatorModule } from './operator/operator.module';
+import { PackmanModule } from './packman/packman.module';
 @Module({
   imports: [
     AuthModule,
@@ -42,6 +44,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
     ReviewModule,
     ClickModule,
     DashboardModule,
+    OperatorModule,
+    PackmanModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AccessTokenGuard },
