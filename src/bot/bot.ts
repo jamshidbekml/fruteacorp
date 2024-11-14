@@ -270,14 +270,14 @@ export class MyBot {
   }
 
   public async launch() {
-    await this.bot.api.setMyCommands([
-      {
-        command: 'start',
-        description: 'Start the bot',
-      },
-    ]);
+    // await this.bot.api.setMyCommands([
+    //   {
+    //     command: 'start',
+    //     description: 'Start the bot',
+    //   },
+    // ]);
 
-    this.bot.start();
+    await this.bot.start();
   }
 
   async sendOrderToOperators(orderId: string) {
