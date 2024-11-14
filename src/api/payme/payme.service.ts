@@ -15,10 +15,9 @@ import { DateTime } from 'luxon';
 import { MyBot } from 'src/bot/bot';
 @Injectable()
 export class PaymeService {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly botService: MyBot,
-  ) {}
+  private botService = new MyBot();
+
+  constructor(private readonly prismaService: PrismaService) {}
 
   async handleTransactionMethods(reqBody: PaymeRequestBody) {
     const method = reqBody.method;

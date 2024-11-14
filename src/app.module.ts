@@ -4,8 +4,6 @@ import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ApiModule } from './api/api.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { BotModule } from './bot/bot.module';
-import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -20,8 +18,6 @@ import { AppController } from './app.controller';
       serveRoot: '/temp/images',
     }),
     ApiModule,
-    BotModule,
   ],
-  controllers: [AppController],
 })
 export class AppModule {}

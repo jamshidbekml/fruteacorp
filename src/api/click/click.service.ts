@@ -13,11 +13,11 @@ import { MyBot } from 'src/bot/bot';
 @Injectable()
 export class ClickService {
   private readonly secretKey: string;
+  private botService = new MyBot();
 
   constructor(
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
-    private readonly botService: MyBot,
   ) {
     this.secretKey = this.configService.get<string>('SECRET_KEY');
   }

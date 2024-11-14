@@ -1,10 +1,8 @@
 import { PrismaService } from 'src/api/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
 import messages from '../assets/messages';
 
-@Injectable()
 export default class BotService {
-  constructor(private readonly prismaService: PrismaService) {}
+  private prismaService = new PrismaService();
 
   async sendUserdata(chatId: number, ctx: any) {
     try {

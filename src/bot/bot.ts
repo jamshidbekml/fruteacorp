@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import { Bot, GrammyError, HttpError, session, Keyboard } from 'grammy';
 import { Router } from '@grammyjs/router';
 import { ConfigService } from '@nestjs/config';
@@ -13,14 +12,10 @@ import InlineKeyboards from './assets/inline-keyboards';
 const config = new ConfigService();
 const bot = new Bot(config.get<string>('TELEGRAM_BOT_TOKEN'));
 
-@Injectable()
 export class MyBot {
   private router = new Router((ctx) => ctx['session'].step);
-
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly botService: BotService,
-  ) {}
+  private botService = new BotService();
+  private prismaService = new PrismaService();
 
   private setupCommands() {
     bot.command('start', async (ctx) => {
