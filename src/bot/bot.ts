@@ -10,23 +10,17 @@ import messages from './assets/messages';
 import BotService from './sevices/bot.service';
 import InlineKeyboards from './assets/inline-keyboards';
 
+const config = new ConfigService();
+const bot = new Bot(config.get<string>('TELEGRAM_BOT_TOKEN'));
+
 @Injectable()
 export class MyBot {
-  private bot: Bot;
   private router;
 
   constructor(
-    private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
     private readonly botService: BotService,
   ) {
-    const token = this.configService.get<string>('TELEGRAM_BOT_TOKEN');
-
-    if (!token) {
-      throw new Error('TELEGRAM_BOT_TOKEN is missing from configuration');
-    }
-
-    this.bot = new Bot(token);
     this.router = new Router((ctx) => ctx['session'].step);
 
     this.setupMiddleware();
@@ -36,7 +30,7 @@ export class MyBot {
   }
 
   private setupCommands() {
-    this.bot.command('start', async (ctx) => {
+    bot.command('start', async (ctx) => {
       console.log(ctx.message);
       await ctx.reply(messages.first_message, {
         reply_markup: Keyboards.contact,
@@ -45,7 +39,7 @@ export class MyBot {
       ctx['session'].step = 'send-sms';
     });
 
-    this.bot.hears(messages.profile, async (ctx) => {
+    bot.hears(messages.profile, async (ctx) => {
       ctx['session'].step = 'idle';
 
       const chat_id = ctx.msg.chat.id;
@@ -53,7 +47,7 @@ export class MyBot {
       return await this.botService.sendUserdata(chat_id, ctx);
     });
 
-    this.bot.on('callback_query:data', async (ctx) => {
+    bot.on('callback_query:data', async (ctx) => {
       const command = ctx.callbackQuery.data.split('?')[0];
 
       switch (command) {
@@ -208,7 +202,7 @@ export class MyBot {
   }
 
   private setupMiddleware() {
-    this.bot.use(
+    bot.use(
       session({
         initial: () => ({
           chat_id: null,
@@ -219,9 +213,9 @@ export class MyBot {
       }),
     );
 
-    this.bot.use(this.router);
+    bot.use(this.router);
 
-    this.bot.use(async (ctx, next) => {
+    bot.use(async (ctx, next) => {
       const user = await this.prismaService.users.findUnique({
         where: {
           telegramId: String(ctx.from.id),
@@ -246,7 +240,7 @@ export class MyBot {
       await next();
     });
 
-    this.bot.use(async (ctx, next) => {
+    bot.use(async (ctx, next) => {
       const publicRoutes = ['idle', 'send-sms', 'confirm-code'];
       if (!publicRoutes.includes(ctx['session'].step)) {
         console.log(ctx['session'].step);
@@ -255,7 +249,7 @@ export class MyBot {
   }
 
   private setupErrorHandling() {
-    this.bot.catch((err) => {
+    bot.catch((err) => {
       const ctx = err.ctx;
       console.error(`Error while handling update ${ctx.update.update_id}:`);
       const e = err.error;
@@ -270,14 +264,14 @@ export class MyBot {
   }
 
   public async launch() {
-    // await this.bot.api.setMyCommands([
-    //   {
-    //     command: 'start',
-    //     description: 'Start the bot',
-    //   },
-    // ]);
+    await bot.api.setMyCommands([
+      {
+        command: 'start',
+        description: 'Start the bot',
+      },
+    ]);
 
-    await this.bot.start();
+    await bot.start();
   }
 
   async sendOrderToOperators(orderId: string) {
@@ -325,14 +319,10 @@ export class MyBot {
         });
 
         for await (const operator of operators) {
-          this.bot.api.sendMessage(
-            operator.telegramId,
-            messages.order_data(order),
-            {
-              parse_mode: 'HTML',
-              reply_markup: InlineKeyboards.confirm_order_operator(orderId),
-            },
-          );
+          bot.api.sendMessage(operator.telegramId, messages.order_data(order), {
+            parse_mode: 'HTML',
+            reply_markup: InlineKeyboards.confirm_order_operator(orderId),
+          });
         }
       }
     } catch (err) {
@@ -387,13 +377,13 @@ export class MyBot {
         });
 
         for await (const packman of packmans) {
-          await this.bot.api.sendLocation(
+          await bot.api.sendLocation(
             packman.telegramId,
             +order.Address.lat,
             +order.Address.long,
           );
 
-          await this.bot.api.sendMessage(
+          await bot.api.sendMessage(
             packman.telegramId,
             messages.order_data(order),
             {
@@ -444,12 +434,12 @@ export class MyBot {
       });
 
       if (order) {
-        await this.bot.api.sendLocation(
+        await bot.api.sendLocation(
           chatId,
           +order.Address.lat,
           +order.Address.long,
         );
-      } else this.bot.api.sendMessage(chatId, `Bunday buyurtma topilmadi 😔`);
+      } else bot.api.sendMessage(chatId, `Bunday buyurtma topilmadi 😔`);
     } catch (err) {
       console.log(err);
     }
