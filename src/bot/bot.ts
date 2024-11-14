@@ -1,6 +1,5 @@
 import { Bot, GrammyError, HttpError, session, Keyboard } from 'grammy';
 import { Router } from '@grammyjs/router';
-import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/api/prisma/prisma.service';
 import { generateRandomNumber } from 'src/api/shared/utils/code-generator';
 import { smsSender } from 'src/api/shared/utils/sms-sender';
@@ -9,8 +8,7 @@ import messages from './assets/messages';
 import BotService from './sevices/bot.service';
 import InlineKeyboards from './assets/inline-keyboards';
 
-const config = new ConfigService();
-const bot = new Bot(config.get<string>('TELEGRAM_BOT_TOKEN'));
+const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
 
 export class MyBot {
   private router = new Router((ctx) => ctx['session'].step);
