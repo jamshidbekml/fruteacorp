@@ -15,19 +15,12 @@ const bot = new Bot(config.get<string>('TELEGRAM_BOT_TOKEN'));
 
 @Injectable()
 export class MyBot {
-  private router;
+  private router = new Router((ctx) => ctx['session'].step);
 
   constructor(
     private readonly prismaService: PrismaService,
     private readonly botService: BotService,
-  ) {
-    this.router = new Router((ctx) => ctx['session'].step);
-
-    this.setupMiddleware();
-    this.setupCommands();
-    this.setupRoutes();
-    this.setupErrorHandling();
-  }
+  ) {}
 
   private setupCommands() {
     bot.command('start', async (ctx) => {
@@ -264,14 +257,19 @@ export class MyBot {
   }
 
   public async launch() {
-    await bot.api.setMyCommands([
+    this.setupMiddleware();
+    this.setupCommands();
+    this.setupRoutes();
+    this.setupErrorHandling();
+
+    bot.api.setMyCommands([
       {
         command: 'start',
         description: 'Start the bot',
       },
     ]);
 
-    await bot.start();
+    bot.start();
   }
 
   async sendOrderToOperators(orderId: string) {
