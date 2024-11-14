@@ -12,5 +12,6 @@ export class BotModule implements OnModuleInit {
 
   async onModuleInit() {
     await this.botService.launch();
+    console.log(`Bot started`);
   }
 }
