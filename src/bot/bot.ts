@@ -251,16 +251,20 @@ export class MyBot {
 
   public async launch() {
     this.setupMiddleware();
+
+    bot.api
+      .setMyCommands([
+        {
+          command: 'start',
+          description: 'Start the bot',
+        },
+      ])
+      .then(() => console.log('Commands set successfully'))
+      .catch((err) => console.error('Error while setting commands:', err));
+
     this.setupCommands();
     this.setupRoutes();
     this.setupErrorHandling();
-
-    bot.api.setMyCommands([
-      {
-        command: 'start',
-        description: 'Start the bot',
-      },
-    ]);
 
     bot.start();
   }
