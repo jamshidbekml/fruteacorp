@@ -257,12 +257,12 @@ export class MyBot {
     this.setupRoutes();
     this.setupErrorHandling();
 
-    // bot.api.setMyCommands([
-    //   {
-    //     command: 'start',
-    //     description: 'Start the bot',
-    //   },
-    // ]);
+    bot.api.setMyCommands([
+      {
+        command: 'start',
+        description: 'Start the bot',
+      },
+    ]);
 
     bot.start();
   }
