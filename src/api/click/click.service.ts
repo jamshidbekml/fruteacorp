@@ -8,12 +8,11 @@ import { ClickRequestBody } from './types/incoming-request-body';
 import { PrismaService } from '../prisma/prisma.service';
 import { GenerateMd5HashParams } from './interfaces/generate-prepare-hash.interface';
 import { createHash } from 'node:crypto';
-import { MyBot } from 'src/bot/bot';
+import axios from 'axios';
 
 @Injectable()
 export class ClickService {
   private readonly secretKey: string;
-  private botService = new MyBot();
 
   constructor(
     private readonly configService: ConfigService,
@@ -197,7 +196,7 @@ export class ClickService {
       },
     });
 
-    this.botService.sendOrderToOperators(order.id);
+    axios.post('http://localhost:6262/operator/' + order.id);
 
     await this.prismaService.cart.deleteMany({
       where: {

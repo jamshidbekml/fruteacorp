@@ -1,11 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateOperatorDto } from './dto/update-operator.dto';
-import { MyBot } from 'src/bot/bot';
+import axios from 'axios';
 
 @Injectable()
 export class OperatorService {
-  private botService = new MyBot();
 
   constructor(private readonly prismaService: PrismaService) {}
 
@@ -171,7 +170,7 @@ export class OperatorService {
     });
 
     if (data.status === 'confirmed' && order.operatorStatus !== 'confirmed') {
-      this.botService.sendOrderToPackmans(order.id);
+      axios.post('http://localhost:6262/packman/' + order.id);
     }
     return 'Buyurtma muvaffaqiyatli o`zgartirildi!';
   }

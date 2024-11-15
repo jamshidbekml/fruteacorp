@@ -6,7 +6,6 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as basicAuth from 'express-basic-auth';
-import { MyBot } from './bot/bot';
 
 async function bootstrap() {
   const app: NestExpressApplication = await NestFactory.create(AppModule);
@@ -37,10 +36,6 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup(`${apiPrefix}/docs`, app, document);
-
-  const bot = new MyBot();
-
-  bot.launch();
 
   await app.listen(port, () => {
     console.log(`Application is running on: ${port}`.bgGreen.bold);

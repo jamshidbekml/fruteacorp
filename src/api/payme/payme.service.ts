@@ -12,10 +12,9 @@ import { CancelTransactionDto } from './dto/cancel-transaction.dto';
 import { CheckTransactionDto } from './dto/check-transaction.dto';
 import { GetStatementDto } from './dto/get-statement.dto';
 import { DateTime } from 'luxon';
-import { MyBot } from 'src/bot/bot';
+import axios from 'axios';
 @Injectable()
 export class PaymeService {
-  private botService = new MyBot();
 
   constructor(private readonly prismaService: PrismaService) {}
 
@@ -293,7 +292,7 @@ export class PaymeService {
       },
     });
 
-    this.botService.sendOrderToOperators(order.id);
+    axios.post('http://localhost:6262/operator/' + order.id);
 
     await this.prismaService.cart.deleteMany({
       where: {
