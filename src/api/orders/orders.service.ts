@@ -179,6 +179,7 @@ export class OrdersService {
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
+        orderNumber: true,
         status: true,
         createdAt: true,
         updatedAt: true,

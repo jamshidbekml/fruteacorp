@@ -43,6 +43,7 @@ export class UsersService {
       include: {
         orders: {
           select: {
+            orderNumber: true,
             items: {
               select: {
                 productId: true,
