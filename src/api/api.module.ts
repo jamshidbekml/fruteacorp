@@ -23,6 +23,7 @@ import { ClickModule } from './click/click.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { OperatorModule } from './operator/operator.module';
 import { PackmanModule } from './packman/packman.module';
+import { ExelModule } from './exel/exel.module';
 @Module({
   imports: [
     AuthModule,
@@ -46,6 +47,7 @@ import { PackmanModule } from './packman/packman.module';
     DashboardModule,
     OperatorModule,
     PackmanModule,
+    ExelModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AccessTokenGuard },

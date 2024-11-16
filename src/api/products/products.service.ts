@@ -81,6 +81,13 @@ export class ProductsService {
   ) {
     if (limit > 50) throw new BadRequestException('limit must be less than 50');
 
+    const categories = [];
+
+    if (categoryId) {
+      const childCategories = await this.getAllChildCategoryIds(categoryId);
+      categories.push(categoryId, ...childCategories);
+    }
+
     const data = await this.prismaService.products.findMany({
       where: {
         ...(search
@@ -101,7 +108,7 @@ export class ProductsService {
               ],
             }
           : {}),
-        ...(categoryId ? { categoryId } : {}),
+        ...(categoryId ? { categoryId: { in: categories } } : {}),
         active: true,
       },
       select: {
@@ -142,7 +149,7 @@ export class ProductsService {
               ],
             }
           : {}),
-        ...(categoryId ? { categoryId } : {}),
+        ...(categoryId ? { categoryId: { in: categories } } : {}),
         active: true,
       },
     });
@@ -160,6 +167,22 @@ export class ProductsService {
     }
 
     return { data: products, total, pageSize: limit, current: page };
+  }
+
+  async getAllChildCategoryIds(categoryId: string): Promise<string[]> {
+    const childCategories = await this.prismaService.categories.findMany({
+      where: { parentId: categoryId },
+      select: { id: true },
+    });
+
+    const childIds = childCategories.map((child) => child.id);
+
+    for (const child of childCategories) {
+      const grandChildIds = await this.getAllChildCategoryIds(child.id);
+      childIds.push(...grandChildIds);
+    }
+
+    return childIds;
   }
 
   async findAllForAdmin(page: number, limit: number, search?: string) {
