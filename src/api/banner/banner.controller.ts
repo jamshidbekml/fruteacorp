@@ -38,7 +38,7 @@ export class BannerController {
 
   @Post()
   @ApiBearerAuth()
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Create Banner' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
@@ -91,7 +91,7 @@ export class BannerController {
 
   @Patch(':id')
   @ApiBearerAuth()
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Update Banner' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
@@ -136,7 +136,7 @@ export class BannerController {
 
   @Delete(':id')
   @ApiBearerAuth()
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Delete Banner' })
   @ApiParam({ name: 'id', type: 'string' })
   remove(@Param('id') id: string) {

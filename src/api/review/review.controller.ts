@@ -43,7 +43,7 @@ export class ReviewController {
     return this.reviewService.create(createReviewDto, orderId, sub);
   }
 
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Get All Review' })
   @ApiQuery({ name: 'page', type: Number, required: false })
   @ApiQuery({ name: 'limit', type: Number, required: false })
@@ -52,7 +52,7 @@ export class ReviewController {
     return this.reviewService.findAll(page, limit);
   }
 
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Write reply message' })
   @ApiBody({ type: ReplyDto })
   @ApiParam({ name: 'id' })
@@ -61,7 +61,7 @@ export class ReviewController {
     return this.reviewService.replyToReview(id, { message });
   }
 
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Delete Review' })
   @ApiParam({ name: 'id' })
   @Delete(':id')

@@ -19,6 +19,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
+import { Roles } from '../auth/decorators/role.decorator';
+import { ROLE } from '@prisma/client';
 
 @ApiBearerAuth()
 @ApiTags('Areas')
@@ -27,6 +29,7 @@ import { TransformInterceptor } from '../interceptors/transform.interceptor';
 export class AreasController {
   constructor(private readonly areasService: AreasService) {}
 
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Create Area' })
   @ApiBody({ type: CreateAreaDto })
   @Post()
@@ -47,6 +50,7 @@ export class AreasController {
     return this.areasService.findOne(id);
   }
 
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Update Area' })
   @ApiParam({ name: 'id' })
   @ApiBody({ type: UpdateAreaDto })
@@ -55,6 +59,7 @@ export class AreasController {
     return this.areasService.update(id, updateAreaDto);
   }
 
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Delete Area' })
   @ApiParam({ name: 'id' })
   @Delete(':id')

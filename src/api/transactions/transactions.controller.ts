@@ -22,7 +22,7 @@ export class TransactionsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'search', required: false })
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,

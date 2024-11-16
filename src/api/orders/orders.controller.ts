@@ -52,7 +52,7 @@ export class OrdersController {
     enum: $Enums.ORDER_STATUS,
     required: true,
   })
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   @ApiQuery({ name: 'search', type: 'string', required: false })
   findAll(
     @Query('page') page: number = 1,
@@ -64,7 +64,7 @@ export class OrdersController {
   }
 
   @Get(':id')
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Buyurtma haqida ma`lumotlarni olish' })
   @ApiParam({ name: 'id', type: 'string', required: true })
   findOne(@Param('id') id: string) {

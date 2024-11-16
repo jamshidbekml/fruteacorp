@@ -17,6 +17,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request } from 'express';
+import { Roles } from '../auth/decorators/role.decorator';
+import { ROLE } from '@prisma/client';
 
 @ApiTags('Upload')
 @Controller('upload')
@@ -24,6 +26,7 @@ export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
   @ApiBearerAuth()
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Upload Image' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({

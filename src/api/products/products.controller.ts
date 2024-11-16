@@ -38,7 +38,7 @@ export class ProductsController {
     type: CreateProductDto,
   })
   @Post()
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
@@ -90,7 +90,7 @@ export class ProductsController {
   }
 
   @ApiBearerAuth()
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Update Product' })
   @ApiBody({
     type: UpdateProductDto,
@@ -102,7 +102,7 @@ export class ProductsController {
   }
 
   @ApiBearerAuth()
-  @Roles(ROLE.superadmin, ROLE.operator)
+  @Roles(ROLE.superadmin)
   @ApiOperation({ summary: 'Delete Product' })
   @ApiParam({ name: 'id' })
   @Delete(':id')
