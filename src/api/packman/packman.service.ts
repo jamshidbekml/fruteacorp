@@ -41,6 +41,9 @@ export class PackmanService {
           : {}),
         packmanId: userId,
       },
+      orderBy: {
+        packmanReceivedAt: 'desc',
+      },
       take: limit,
       skip: (page - 1) * limit,
     });

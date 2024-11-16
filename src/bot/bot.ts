@@ -18,7 +18,6 @@ export class MyBot {
 
   private setupCommands() {
     bot.command('start', async (ctx) => {
-      console.log(ctx.message);
       await ctx.reply(messages.first_message, {
         reply_markup: Keyboards.contact,
         parse_mode: 'HTML',
@@ -53,7 +52,7 @@ export class MyBot {
         case 'confirm_packman': {
           try {
             const orderId = ctx.callbackQuery.data.split('=')[1];
-            return await this.botService.setOrderToOperator(
+            return await this.botService.setOrderToPackman(
               orderId,
               ctx.callbackQuery.from.id,
               ctx,

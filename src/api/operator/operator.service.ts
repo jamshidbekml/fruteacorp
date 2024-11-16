@@ -44,6 +44,9 @@ export class OperatorService {
           : {}),
         operatorId: userId,
       },
+      orderBy: {
+        operatorReceivedAt: 'desc',
+      },
       take: limit,
       skip: (page - 1) * limit,
     });

@@ -46,6 +46,7 @@ export default class BotService {
       data: {
         operatorId: user.id,
         operatorStatus: 'received',
+        operatorReceivedAt: new Date(),
       },
     });
 
@@ -78,6 +79,7 @@ export default class BotService {
       data: {
         packmanId: user.id,
         packmanStatus: 'received',
+        packmanReceivedAt: new Date(),
       },
     });
 
