@@ -39,7 +39,7 @@ export class OperatorController {
     @Query('search') search?: string,
   ) {
     const { sub } = req['user'] as { sub: string };
-    return this.operatorService.findAll(sub, page, limit, search);
+    return this.operatorService.findAll(sub, +page, +limit, search);
   }
 
   @Roles(ROLE.operator)

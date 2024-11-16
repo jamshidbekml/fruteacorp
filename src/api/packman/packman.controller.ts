@@ -40,7 +40,7 @@ export class PackmanController {
   ) {
     const { sub } = req['user'] as { sub: string };
 
-    return this.packmanService.findAll(sub, page, limit, search);
+    return this.packmanService.findAll(sub, +page, +limit, search);
   }
 
   @Roles(ROLE.packman)
