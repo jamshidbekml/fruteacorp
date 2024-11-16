@@ -55,4 +55,13 @@ export class PackmanController {
     const { sub } = req['user'] as { sub: string };
     return this.packmanService.update(sub, id, body);
   }
+
+  @Roles(ROLE.packman)
+  @Get(':id')
+  @ApiOperation({ summary: 'Get Packman order' })
+  @ApiParam({ name: 'id' })
+  findOne(@Req() req: Request, @Param('id') id: string) {
+    const { sub } = req['user'] as { sub: string };
+    return this.packmanService.findOne(sub, id);
+  }
 }

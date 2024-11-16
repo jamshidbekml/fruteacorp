@@ -64,7 +64,7 @@ export class OrdersController {
   }
 
   @Get(':id')
-  @Roles(ROLE.superadmin)
+  @Roles(ROLE.superadmin, ROLE.operator, ROLE.packman)
   @ApiOperation({ summary: 'Buyurtma haqida ma`lumotlarni olish' })
   @ApiParam({ name: 'id', type: 'string', required: true })
   findOne(@Param('id') id: string) {

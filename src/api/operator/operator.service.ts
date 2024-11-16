@@ -179,4 +179,35 @@ export class OperatorService {
 
     return 'Buyurtma muvaffaqiyatli o`zgartirildi!';
   }
+
+  async findOne(userId: string, orderId: string) {
+    const order = await this.prismaService.orders.findUnique({
+      where: { id: orderId, operatorId: userId },
+      select: {
+        items: {
+          include: {
+            Product: true,
+          },
+        },
+        User: {
+          select: {
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+        Packman: {
+          select: {
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+      },
+    });
+
+    if (!order) throw new NotFoundException('Buyurtma topilmadi!');
+
+    return order;
+  }
 }

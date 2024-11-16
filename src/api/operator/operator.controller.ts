@@ -54,4 +54,13 @@ export class OperatorController {
     const { sub } = req['user'] as { sub: string };
     return this.operatorService.update(sub, id, body);
   }
+
+  @Roles(ROLE.operator)
+  @Get(':id')
+  @ApiOperation({ summary: 'Get operator order' })
+  @ApiParam({ name: 'id' })
+  findOne(@Req() req: Request, @Param('id') id: string) {
+    const { sub } = req['user'] as { sub: string };
+    return this.operatorService.findOne(sub, id);
+  }
 }
