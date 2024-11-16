@@ -4,7 +4,6 @@ import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ApiModule } from './api/api.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -20,6 +19,5 @@ import { AppController } from './app.controller';
     }),
     ApiModule,
   ],
-  controllers: [AppController],
 })
 export class AppModule {}
