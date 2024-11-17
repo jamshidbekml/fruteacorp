@@ -18,11 +18,10 @@ export class MyBot {
 
   private setupCommands() {
     bot.command('start', async (ctx) => {
-      await ctx.reply(messages.first_message, {
-        reply_markup: Keyboards.contact,
-        parse_mode: 'HTML',
-      });
-      ctx['session'].step = 'send-sms';
+      const orderId = ctx.message.text.split(' ')[1];
+
+      if (orderId)
+        return await this.sendLocationToPackman(orderId, ctx.message.chat.id);
     });
 
     bot.hears(messages.profile, async (ctx) => {
@@ -124,18 +123,6 @@ export class MyBot {
         `Sizga tasdiqlash kodi yuborildi!\n\n<b>Tasdiqlash kodini kiriting.</b> 👇`,
         { parse_mode: 'HTML', reply_markup: { remove_keyboard: true } },
       );
-
-      // if (user.role === 'packman') {
-      //   await ctx.reply(
-      //     `Assalomu alakum ${user.firstName}.\nBu yerda siz yetkazib berish uchun buyurtmalarni qabul qilishingiz mumkin!`,
-      //   );
-      // }
-
-      // const name = ctx.message.contact.first_name;
-      // const message =
-      //   `Sizning ismingiz ${name} va telefon raqamingiz ${phone} ga jo` +
-      //   'natirilgan.';
-      // await ctx.reply(message);
     });
 
     this.router.route('confirm-code', async (ctx) => {
@@ -217,11 +204,6 @@ export class MyBot {
           parse_mode: 'HTML',
         });
       }
-
-      const orderId = ctx.message.text.split(' ')[1];
-
-      if (orderId)
-        return await this.sendLocationToPackman(orderId, ctx.message.chat.id);
 
       await next();
     });
