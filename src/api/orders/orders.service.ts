@@ -65,14 +65,16 @@ export class OrdersService {
             where: { id: createOrderDto.promoCodeId },
             select: {
               discount: true,
+              promocode: true,
             },
           })
           .then((data) => {
             return {
               discount: (amount * data.discount) / 100,
+              promocode: data.promocode,
             };
           })
-      : { discount: 0 };
+      : { discount: 0, promocode: null };
 
     const address = await this.prismaService.userAddress.findUnique({
       where: { id: createOrderDto.addressId },
@@ -100,6 +102,7 @@ export class OrdersService {
           deliveryInfo: createOrderDto.deliveryInfo,
           deliveryPrice,
           paymentType: createOrderDto.paymentType,
+          promoCode: promo.promocode,
         },
       });
 

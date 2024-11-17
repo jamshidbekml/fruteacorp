@@ -16,6 +16,7 @@ model Orders {
     type                ORDER_TYPE             @default(product)
     paymentType         PAYMENT_TYPE
     addressId           String?                @db.Uuid
+    promoCode           String?                @default("-")
     deliveryInfo        String?
     extraInfo           String?
     createdAt           DateTime               @default(now())
