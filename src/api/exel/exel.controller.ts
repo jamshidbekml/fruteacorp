@@ -10,7 +10,7 @@ import { ROLE } from '@prisma/client';
 export class ExelController {
   constructor(private readonly exelService: ExelService) {}
 
-  @ApiOperation({ summary: 'Импорт заказов' })
+  @ApiOperation({ summary: 'Отчет по ЗАКАЗам' })
   @Roles(ROLE.superadmin)
   @Get('/orders')
   async importOrders(
