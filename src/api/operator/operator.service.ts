@@ -174,7 +174,7 @@ export class OperatorService {
     });
 
     if (data.status === 'confirmed' && order.operatorStatus !== 'confirmed') {
-      this.botService.sendOrderToOperators(order.id);
+      this.botService.sendOrderToPackmans(order.id);
     }
 
     return 'Buyurtma muvaffaqiyatli o`zgartirildi!';
