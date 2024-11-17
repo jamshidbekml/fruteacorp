@@ -178,6 +178,27 @@ export class PackmanService {
       },
     });
 
+    if (data.status === 'onway' && order.status !== 'onway') {
+      await this.prismaService.orders.update({
+        where: {
+          id: order.id,
+        },
+        data: {
+          status: 'onway',
+        },
+      });
+    } else if (data.status === 'delivered' && order.status !== 'delivered') {
+      await this.prismaService.orders.update({
+        where: {
+          id: order.id,
+        },
+        data: {
+          status: 'delivered',
+          packmanDeliveredAt: new Date(),
+        },
+      });
+    }
+
     return 'Buyurtma muvaffaqiyatli o`zgartirildi!';
   }
 
