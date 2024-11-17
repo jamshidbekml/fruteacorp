@@ -2,10 +2,12 @@ import { Controller, Get, Query, Res } from '@nestjs/common';
 import { ExelService } from './exel.service';
 import * as XLSX from 'xlsx';
 import { Response } from 'express';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/role.decorator';
 import { ROLE } from '@prisma/client';
 
+@ApiBearerAuth()
+@ApiTags('Export exel report')
 @Controller('exel')
 export class ExelController {
   constructor(private readonly exelService: ExelService) {}
