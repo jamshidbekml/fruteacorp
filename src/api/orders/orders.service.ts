@@ -89,7 +89,7 @@ export class OrdersService {
           })
           .then((data) => {
             return {
-              discount: (amount * data.discount) / 100,
+              discount: Number(((amount * data.discount) / 100).toFixed(0)),
               promocode: data.promocode,
             };
           })
