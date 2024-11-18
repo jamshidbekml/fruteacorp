@@ -104,7 +104,7 @@ export class ExelService {
         JOIN orders AS o ON op."orderId" = o.id
         WHERE o."createdAt" BETWEEN ${start} AND ${end}
           AND o.status IN ('paid', 'onway', 'delivered')
-        GROUP BY p.id, p.title_uz, p.title_ru
+        GROUP BY op.title_ru
         ORDER BY totalQuantity DESC;
       `;
 
