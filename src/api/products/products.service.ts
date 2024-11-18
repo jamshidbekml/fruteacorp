@@ -438,6 +438,7 @@ export class ProductsService {
         title_ru: true,
         title_uz: true,
         amount: true,
+        inStock: true,
         discountAmount: true,
         discountStatus: true,
         discountExpiresAt: true,
