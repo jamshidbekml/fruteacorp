@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Ordering, Sorting } from '../shared/enums';
 
@@ -85,6 +89,10 @@ export class DashboardService {
       const end = toDate
         ? new Date(toDate)
         : new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
+
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        throw new BadRequestException('Invalid date range provided.');
+      }
 
       // Initialize an array to hold daily statistics
       const dailyStatistics = [];
@@ -408,6 +416,10 @@ export class DashboardService {
         ? new Date(toDate)
         : new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
 
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        throw new BadRequestException('Invalid date range provided.');
+      }
+
       const users = await this.prismaService.$queryRaw`
         WITH product_details AS (
           SELECT 
@@ -449,8 +461,6 @@ export class DashboardService {
           ON o."userId" = u.id
           AND o."createdAt" BETWEEN ${start} AND ${end}
           AND o.status IN ('paid', 'onway', 'delivered')
-        LEFT JOIN order_products AS op
-          ON op."orderId" = o.id
         GROUP BY u.id, u."firstName", u."lastName", u."phone"
         ORDER BY orderCount DESC
         LIMIT ${limit} OFFSET ${(page - 1) * limit};
@@ -459,7 +469,11 @@ export class DashboardService {
       const count = await this.prismaService.$queryRaw`
         SELECT 
           CAST(COUNT(DISTINCT u.id) AS INT) AS total
-          FROM users AS u
+        FROM users AS u
+        LEFT JOIN orders AS o
+          ON o."userId" = u.id
+          AND o."createdAt" BETWEEN ${start} AND ${end}
+          AND o.status IN ('paid', 'onway', 'delivered');
       `;
 
       return {
@@ -469,7 +483,7 @@ export class DashboardService {
         current: page,
       };
     } catch (err) {
-      console.log(err);
+      console.error('Error fetching user orders:', err);
       throw new InternalServerErrorException();
     }
   }
