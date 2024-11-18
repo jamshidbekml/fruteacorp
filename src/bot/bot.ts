@@ -32,6 +32,23 @@ export class MyBot {
       return await this.botService.sendUserdata(chat_id, ctx);
     });
 
+    bot.hears('📒 Buyurtmalar', async (ctx) => {
+      ctx.reply("Buyurtmalarni ko'rish ↗️", {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: '📒 Buyurtmalar',
+                web_app: {
+                  url: 'https://fruteacorp-dash.vercel.app/',
+                },
+              },
+            ],
+          ],
+        },
+      });
+    });
+
     bot.on('callback_query:data', async (ctx) => {
       const command = ctx.callbackQuery.data.split('?')[0];
 
