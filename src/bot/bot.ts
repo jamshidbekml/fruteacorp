@@ -222,7 +222,7 @@ export class MyBot {
         });
       }
 
-      if (ctx.message.text === '/start') {
+      if (ctx.message?.text && ctx.message.text === '/start') {
         return ctx.reply(`Ishlashda davom etishingiz mumkin!`, {
           reply_markup: Keyboards.main_menu,
         });
