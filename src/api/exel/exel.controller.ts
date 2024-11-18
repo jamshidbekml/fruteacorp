@@ -90,7 +90,14 @@ export class ExelController {
 
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.aoa_to_sheet([
-      ['ФИО', 'Номер телефона', 'Количество заказов', 'Общая сумма', 'Регион'],
+      [
+        '№ клиента',
+        'ФИО',
+        'Номер телефона',
+        'Количество заказов',
+        'Общая сумма',
+        'Регион',
+      ],
       ,
       ...data,
     ]);
@@ -106,6 +113,58 @@ export class ExelController {
     res.setHeader(
       'Content-Disposition',
       `attachment; filename*=UTF-8''${encodeURIComponent('БАЗА_Отчет по клиентам.xlsx')}`,
+    );
+
+    res.send(buffer);
+  }
+
+  @ApiOperation({ summary: 'Продажи товаров за период' })
+  @ApiQuery({
+    name: 'fromDate',
+    type: 'string',
+    required: false,
+    description: 'Начало периода',
+  })
+  @ApiQuery({
+    name: 'toDate',
+    type: 'string',
+    required: false,
+    description: 'Конец периода',
+  })
+  @Roles(ROLE.superadmin)
+  async retrieveProductSalesForPeriod(
+    @Res() res: Response,
+    @Query('fromDate') fromDate,
+    @Query('toDate') toDate,
+  ) {
+    const data = await this.exelService.retrieveProductSalesForPeriod(
+      fromDate,
+      toDate,
+    );
+
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet([
+      [
+        '№',
+        'Наименование товара',
+        'Период продажи',
+        'Кол-во проданных штук',
+        'Сумма продаж за период',
+      ],
+      ...data,
+    ]);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
+
+    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename*=UTF-8''${encodeURIComponent('Продажи товаров за период.xlsx')}`,
     );
 
     res.send(buffer);

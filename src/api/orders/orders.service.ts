@@ -38,7 +38,23 @@ export class OrdersService {
 
     let amount: number = 0;
 
-    for (const product of cart.products) {
+    for await (const product of cart.products) {
+      const dbProduct = await this.prismaService.products.findUnique({
+        where: { id: product.productId },
+      });
+
+      if (dbProduct.inStock < product.quantity || dbProduct.active === false) {
+        await this.prismaService.cartProduct.delete({
+          where: {
+            id: product.id,
+          },
+        });
+
+        throw new BadRequestException(
+          `${dbProduct.title_ru} omborda qolmagan!`,
+        );
+      }
+
       amount =
         amount +
         (product.Product.discountStatus === 'active'

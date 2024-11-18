@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -6,14 +10,25 @@ export class ExelService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async importOrders(startDate: Date, endDate: Date) {
+    const start = startDate
+      ? new Date(startDate)
+      : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const end = endDate
+      ? new Date(endDate)
+      : new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      throw new BadRequestException('Invalid date range provided.');
+    }
+
     const result = [];
 
     const data = await this.prismaService.orderProduct.findMany({
       where: {
         Order: {
           createdAt: {
-            gte: startDate,
-            lte: endDate,
+            gte: start,
+            lte: end,
           },
           status: {
             in: ['paid', 'onway', 'delivered'],
@@ -64,6 +79,54 @@ export class ExelService {
     return result;
   }
 
+  async retrieveProductSalesForPeriod(startDate: Date, endDate: Date) {
+    try {
+      const start = startDate
+        ? new Date(startDate)
+        : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      const end = endDate
+        ? new Date(endDate)
+        : new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
+
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        throw new BadRequestException('Invalid date range provided.');
+      }
+
+      const result = [];
+
+      const data: any[] = await this.prismaService.$queryRaw`
+        SELECT
+          ROW_NUMBER() OVER (ORDER BY SUM(op.quantity) DESC) AS id,
+          op.title_ru,
+          SUM(op.quantity) AS totalQuantity,
+          SUM(op.amount) AS totalAmount
+        FROM order_products AS op
+        JOIN orders AS o ON op."orderId" = o.id
+        WHERE o."createdAt" BETWEEN ${start} AND ${end}
+          AND o.status IN ('paid', 'onway', 'delivered')
+        GROUP BY p.id, p.title_uz, p.title_ru
+        ORDER BY totalQuantity DESC;
+      `;
+
+      if (data.length > 0) {
+        for (const item of data) {
+          result.push([
+            item.id,
+            item.title_ru,
+            start.toLocaleDateString() + ' - ' + end.toLocaleDateString(),
+            item.totalQuantity,
+            item.totalAmount,
+          ]);
+        }
+      }
+
+      return result;
+    } catch (err) {
+      console.log(err);
+      throw new InternalServerErrorException();
+    }
+  }
+
   async importUsers() {
     const result = [];
 
@@ -96,14 +159,18 @@ export class ExelService {
     `;
 
     if (data && data.length > 0) {
+      let index = 0;
       for (const item of data) {
         result.push([
+          index + 1,
           item.user_name,
           item.phone,
           item.count,
           Number(item.total),
           item.region || '-',
         ]);
+
+        index++;
       }
     }
 
