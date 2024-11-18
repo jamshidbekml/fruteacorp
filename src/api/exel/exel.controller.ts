@@ -2,7 +2,12 @@ import { Controller, Get, Query, Res } from '@nestjs/common';
 import { ExelService } from './exel.service';
 import * as XLSX from 'xlsx';
 import { Response } from 'express';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/role.decorator';
 import { ROLE } from '@prisma/client';
 
@@ -13,6 +18,18 @@ export class ExelController {
   constructor(private readonly exelService: ExelService) {}
 
   @ApiOperation({ summary: 'Отчет по ЗАКАЗам' })
+  @ApiQuery({
+    name: 'fromDate',
+    type: 'string',
+    required: false,
+    description: 'Начало периода',
+  })
+  @ApiQuery({
+    name: 'toDate',
+    type: 'string',
+    required: false,
+    description: 'Конец периода',
+  })
   @Roles(ROLE.superadmin)
   @Get('/orders')
   async importOrders(
