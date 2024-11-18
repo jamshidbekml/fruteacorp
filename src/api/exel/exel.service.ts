@@ -98,8 +98,8 @@ export class ExelService {
         SELECT
           ROW_NUMBER() OVER (ORDER BY SUM(op.quantity) DESC) AS id,
           op.title_ru,
-          SUM(op.quantity) AS totalQuantity,
-          SUM(op.amount) AS totalAmount
+          CAST(SUM(op.quantity) AS INT) AS totalQuantity,
+          CAST(SUM(op.amount) AS DECIMAL) AS totalAmount
         FROM order_products AS op
         JOIN orders AS o ON op."orderId" = o.id
         WHERE o."createdAt" BETWEEN ${start} AND ${end}
@@ -114,8 +114,8 @@ export class ExelService {
             item.id,
             item.title_ru,
             start.toLocaleDateString() + ' - ' + end.toLocaleDateString(),
-            item.totalQuantity,
-            item.totalAmount,
+            Number(item.totalQuantity),
+            item.totalAmount.toFixed(2),
           ]);
         }
       }
