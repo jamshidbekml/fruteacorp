@@ -132,6 +132,7 @@ export class ExelController {
     description: 'Конец периода',
   })
   @Roles(ROLE.superadmin)
+  @Get('products')
   async retrieveProductSalesForPeriod(
     @Res() res: Response,
     @Query('fromDate') fromDate,
