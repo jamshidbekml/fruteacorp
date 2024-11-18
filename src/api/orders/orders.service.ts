@@ -138,17 +138,17 @@ export class OrdersService {
           },
         });
 
-        await prisma.products.update({
-          where: { id: product.productId },
-          data: {
-            inStock: {
-              decrement: product.quantity,
-            },
-            sold: {
-              increment: product.quantity,
-            },
-          },
-        });
+        // await prisma.products.update({
+        //   where: { id: product.productId },
+        //   data: {
+        //     inStock: {
+        //       decrement: product.quantity,
+        //     },
+        //     sold: {
+        //       increment: product.quantity,
+        //     },
+        //   },
+        // });
       }
 
       if (createOrderDto.paymentType === $Enums.PAYMENT_TYPE.payme) {

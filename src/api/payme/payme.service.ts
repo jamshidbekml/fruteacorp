@@ -291,6 +291,9 @@ export class PaymeService {
       data: {
         status: 'paid',
       },
+      include: {
+        items: true,
+      },
     });
 
     this.botService.sendOrderToOperators(order.id);
@@ -300,6 +303,19 @@ export class PaymeService {
         userId: order.userId,
       },
     });
+
+    for await (const item of order.items) {
+      await this.prismaService.products.update({
+        where: {
+          id: item.productId,
+        },
+        data: {
+          inStock: {
+            decrement: item.quantity,
+          },
+        },
+      });
+    }
 
     return {
       result: {
