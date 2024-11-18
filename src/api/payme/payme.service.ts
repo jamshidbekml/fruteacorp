@@ -298,12 +298,6 @@ export class PaymeService {
 
     this.botService.sendOrderToOperators(order.id);
 
-    await this.prismaService.cart.deleteMany({
-      where: {
-        userId: order.userId,
-      },
-    });
-
     for await (const item of order.items) {
       await this.prismaService.products.update({
         where: {
