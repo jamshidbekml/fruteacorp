@@ -173,7 +173,11 @@ export class OperatorService {
       },
     });
 
-    if (data.status === 'confirmed' && order.operatorStatus !== 'confirmed') {
+    if (
+      data.status === 'confirmed' &&
+      order.operatorStatus !== 'confirmed' &&
+      order.status !== 'onway'
+    ) {
       this.botService.sendOrderToPackmans(order.id);
     }
 

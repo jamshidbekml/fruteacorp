@@ -10,9 +10,12 @@ import { generatePaymeUrl } from '../shared/utils/payme-url-generator';
 import { $Enums } from '@prisma/client';
 import { PromoService } from '../promo/promo.service';
 import { ConfigService } from '@nestjs/config';
+import { MyBot } from 'src/bot/bot';
 
 @Injectable()
 export class OrdersService {
+  private readonly botService = new MyBot();
+
   constructor(
     private prismaService: PrismaService,
     private readonly promoService: PromoService,
@@ -306,6 +309,14 @@ export class OrdersService {
       where: { id: order.id },
       data: updateOrderDto,
     });
+
+    if (
+      updateOrderDto.status === 'onway' &&
+      order.status !== 'onway' &&
+      order.operatorStatus !== 'confirmed'
+    ) {
+      this.botService.sendOrderToPackmans(order.id);
+    }
 
     return 'Buyurtma muvaffaqiyatli o`zgartirildi!';
   }
