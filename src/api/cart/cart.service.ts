@@ -69,10 +69,11 @@ export class CartService {
       where: { id: cartItemDto.productId },
       select: {
         inStock: true,
+        active: true,
       },
     });
 
-    if (product.inStock <= 0)
+    if (product.inStock <= 0 || product.active === false)
       throw new BadRequestException(
         `Mahsulot sotuvda mavjud emas yoki sotib bo'lindi!`,
       );
