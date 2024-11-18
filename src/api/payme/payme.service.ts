@@ -307,6 +307,9 @@ export class PaymeService {
           inStock: {
             decrement: item.quantity,
           },
+          sold: {
+            increment: item.quantity,
+          },
         },
       });
     }

@@ -209,6 +209,9 @@ export class ClickService {
           inStock: {
             decrement: item.quantity,
           },
+          sold: {
+            increment: item.quantity,
+          },
         },
       });
     }
