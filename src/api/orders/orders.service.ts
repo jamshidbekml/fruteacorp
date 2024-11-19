@@ -104,9 +104,9 @@ export class OrdersService {
 
     const deliveryPrice = address.deliveryArea.freeDelivery
       ? 0
-      : Number(address.deliveryArea.freeDeliveryFrom) <= amount
-        ? 0
-        : Number(address.deliveryArea.deliveryPrice);
+      : Number(address.deliveryArea.freeDeliveryFrom) < amount
+        ? Number(address.deliveryArea.deliveryPrice)
+        : 0;
 
     amount = amount + deliveryPrice;
 
