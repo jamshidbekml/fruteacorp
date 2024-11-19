@@ -11,14 +11,34 @@ import {
 
 export class UpdateAreaDto extends PartialType(CreateAreaDto) {
   @ApiProperty({
-    description: 'Area name',
+    description: 'Area name UZ. is must be unique',
     required: false,
     type: 'string',
   })
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  area?: string;
+  areaUZ?: string;
+
+  @ApiProperty({
+    description: 'Area name RU. is must be unique',
+    required: false,
+    type: 'string',
+  })
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  areaRU?: string;
+
+  @ApiProperty({
+    description: 'Area name RU. is must be unique',
+    required: false,
+    type: 'string',
+  })
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  areaEN?: string;
 
   @ApiProperty({
     description: 'Delivery price',

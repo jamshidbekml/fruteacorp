@@ -32,6 +32,16 @@ export class CreateAreaDto implements Partial<Areas> {
   areaRU: string;
 
   @ApiProperty({
+    description: 'Area name RU. is must be unique',
+    required: true,
+    type: 'string',
+  })
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
+  areaEN: string;
+
+  @ApiProperty({
     description: 'Delivery price',
     required: true,
     type: 'number',

@@ -2,6 +2,7 @@ model Areas {
     id               String        @id @default(uuid()) @db.Uuid
     areaUZ           String        @unique
     areaRU           String        @unique
+    areaEN           String        @unique
     deliveryPrice    Decimal       @db.Decimal(10, 2)
     freeDeliveryFrom Decimal       @db.Decimal(10, 2)
     freeDelivery     Boolean       @default(false)

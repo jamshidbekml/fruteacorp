@@ -13,7 +13,11 @@ export class AreasService {
 
   async create(createAreaDto: CreateAreaDto) {
     const found = await this.prismaService.areas.findUnique({
-      where: { areaUZ: createAreaDto.areaUZ, areaRU: createAreaDto.areaRU },
+      where: {
+        areaUZ: createAreaDto.areaUZ,
+        areaRU: createAreaDto.areaRU,
+        areaEN: createAreaDto.areaEN,
+      },
     });
 
     if (found) {
