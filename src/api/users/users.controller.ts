@@ -47,17 +47,32 @@ export class UsersController {
 
   @Roles(ROLE.superadmin)
   @NestedSerialize(UserDto)
-  @ApiOperation({ summary: 'Get All Users' })
+  @ApiOperation({ summary: 'Get All Employee' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'search', required: false, type: String })
-  @Get()
+  @Get('/employee')
   findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('search') search?: string,
   ) {
     return this.usersService.findAll(+page, +limit, search);
+  }
+
+  @Roles(ROLE.superadmin)
+  @NestedSerialize(UserDto)
+  @ApiOperation({ summary: 'Get All Users' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @Get('/client')
+  findAllUsers(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('search') search?: string,
+  ) {
+    return this.usersService.findAllUsers(+page, +limit, search);
   }
 
   @Roles(ROLE.superadmin)

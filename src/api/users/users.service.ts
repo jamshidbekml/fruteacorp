@@ -123,17 +123,18 @@ export class UsersService {
 
   async findAll(page: number, limit: number, search?: string) {
     const users = await this.prismaService.users.findMany({
-      ...(search
-        ? {
-            where: {
+      where: {
+        ...(search
+          ? {
               OR: [
                 { firstName: { contains: search, mode: 'insensitive' } },
                 { lastName: { contains: search, mode: 'insensitive' } },
                 { phone: { contains: search, mode: 'insensitive' } },
               ],
-            },
-          }
-        : {}),
+            }
+          : {}),
+        role: { in: ['operator', 'packman', 'superadmin'] },
+      },
       skip: (page - 1) * limit,
       take: limit,
       select: {
@@ -148,17 +149,68 @@ export class UsersService {
     });
 
     const total = await this.prismaService.users.count({
-      ...(search
-        ? {
-            where: {
+      where: {
+        ...(search
+          ? {
               OR: [
                 { firstName: { contains: search, mode: 'insensitive' } },
                 { lastName: { contains: search, mode: 'insensitive' } },
                 { phone: { contains: search, mode: 'insensitive' } },
               ],
-            },
-          }
-        : {}),
+            }
+          : {}),
+        role: { in: ['operator', 'packman', 'superadmin'] },
+      },
+    });
+
+    return {
+      data: users,
+      pageSize: limit,
+      current: page,
+      total,
+    };
+  }
+
+  async findAllUsers(page: number, limit: number, search?: string) {
+    const users = await this.prismaService.users.findMany({
+      where: {
+        ...(search
+          ? {
+              OR: [
+                { firstName: { contains: search, mode: 'insensitive' } },
+                { lastName: { contains: search, mode: 'insensitive' } },
+                { phone: { contains: search, mode: 'insensitive' } },
+              ],
+            }
+          : {}),
+        role: { in: ['user'] },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        id: true,
+        phone: true,
+        role: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    const total = await this.prismaService.users.count({
+      where: {
+        ...(search
+          ? {
+              OR: [
+                { firstName: { contains: search, mode: 'insensitive' } },
+                { lastName: { contains: search, mode: 'insensitive' } },
+                { phone: { contains: search, mode: 'insensitive' } },
+              ],
+            }
+          : {}),
+        role: { in: ['user'] },
+      },
     });
 
     return {
