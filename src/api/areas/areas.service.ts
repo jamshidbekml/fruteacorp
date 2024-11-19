@@ -12,11 +12,19 @@ export class AreasService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createAreaDto: CreateAreaDto) {
-    const found = await this.prismaService.areas.findUnique({
+    const found = await this.prismaService.areas.findFirst({
       where: {
-        areaUZ: createAreaDto.areaUZ,
-        areaRU: createAreaDto.areaRU,
-        areaEN: createAreaDto.areaEN,
+        OR: [
+          {
+            areaUZ: createAreaDto.areaUZ,
+          },
+          {
+            areaRU: createAreaDto.areaRU,
+          },
+          {
+            areaEN: createAreaDto.areaEN,
+          },
+        ],
       },
     });
 
