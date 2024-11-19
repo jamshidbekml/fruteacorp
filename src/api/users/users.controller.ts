@@ -8,6 +8,7 @@ import {
   Query,
   Req,
   UseInterceptors,
+  Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -26,6 +27,7 @@ import { Roles } from '../auth/decorators/role.decorator';
 import { Request } from 'express';
 import { NestedSerialize } from '../interceptors/nested-serialize.interceptor';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @ApiBearerAuth()
 @ApiTags('Users')
@@ -33,6 +35,15 @@ import { TransformInterceptor } from '../interceptors/transform.interceptor';
 @UseInterceptors(TransformInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Roles(ROLE.superadmin)
+  @Serialize(UserDto)
+  @ApiOperation({ summary: 'Create User' })
+  @ApiBody({ type: CreateUserDto })
+  @Post('employee')
+  create(@Body() body: CreateUserDto) {
+    return this.usersService.create(body);
+  }
 
   @Roles(ROLE.superadmin)
   @NestedSerialize(UserDto)
