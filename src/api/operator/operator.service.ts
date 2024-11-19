@@ -207,6 +207,19 @@ export class OperatorService {
             phone: true,
           },
         },
+        operatorStatus: true,
+        Address: {
+          select: {
+            deliveryArea: {
+              select: {
+                areaEN: true,
+                areaRU: true,
+                areaUZ: true,
+              },
+            },
+            streetName: true,
+          },
+        },
       },
     });
 
