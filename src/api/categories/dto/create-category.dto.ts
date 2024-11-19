@@ -17,6 +17,11 @@ export class TitleDto {
   @IsNotEmpty()
   @IsString()
   ru: string;
+
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
+  en: string;
 }
 
 export class CreateCategoryDto {

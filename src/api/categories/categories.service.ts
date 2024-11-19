@@ -12,6 +12,7 @@ export class CategoriesService {
       data: {
         title_ru: createCategoryDto.title.ru,
         title_uz: createCategoryDto.title.uz,
+        title_en: createCategoryDto.title.en,
         parentId: createCategoryDto.parentId || null,
       },
     });
@@ -32,6 +33,12 @@ export class CategoriesService {
                 },
                 {
                   title_uz: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  title_en: {
                     contains: search,
                     mode: 'insensitive',
                   },
@@ -75,6 +82,12 @@ export class CategoriesService {
                 },
                 {
                   title_uz: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  title_en: {
                     contains: search,
                     mode: 'insensitive',
                   },
@@ -128,6 +141,7 @@ export class CategoriesService {
       data: {
         title_ru: updateCategoryDto.title.ru,
         title_uz: updateCategoryDto.title.uz,
+        title_en: updateCategoryDto.title.en,
         parentId: updateCategoryDto.parentId || null,
       },
     });

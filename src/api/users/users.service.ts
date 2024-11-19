@@ -53,6 +53,9 @@ export class UsersService {
                 title_ru: true,
                 Product: {
                   select: {
+                    title_uz: true,
+                    title_ru: true,
+                    title_en: true,
                     images: {
                       where: { isMain: true },
                       select: {

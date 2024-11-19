@@ -17,8 +17,10 @@ export class ProductsService {
         data: {
           title_ru: createProductDto.title_ru,
           title_uz: createProductDto.title_uz,
+          title_en: createProductDto.title_en,
           description_ru: createProductDto?.description_ru,
           description_uz: createProductDto?.description_uz,
+          description_en: createProductDto?.description_en,
           categoryId: createProductDto.categoryId,
           amount: createProductDto?.amount,
           active: createProductDto?.active,
@@ -28,6 +30,7 @@ export class ProductsService {
           inStock: createProductDto?.inStock,
           extraInfoUz: createProductDto?.extraInfoUz,
           extraInfoRu: createProductDto?.extraInfoRu,
+          extraInfoEn: createProductDto?.extraInfoEn,
         },
       });
 
@@ -105,6 +108,12 @@ export class ProductsService {
                     mode: 'insensitive',
                   },
                 },
+                {
+                  title_en: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
               ],
             }
           : {}),
@@ -115,6 +124,7 @@ export class ProductsService {
         id: true,
         title_ru: true,
         title_uz: true,
+        title_en: true,
         amount: true,
         discountAmount: true,
         discountStatus: true,
@@ -142,6 +152,12 @@ export class ProductsService {
                 },
                 {
                   title_uz: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  title_en: {
                     contains: search,
                     mode: 'insensitive',
                   },
@@ -205,6 +221,12 @@ export class ProductsService {
                     mode: 'insensitive',
                   },
                 },
+                {
+                  title_en: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
               ],
             }
           : {}),
@@ -232,6 +254,12 @@ export class ProductsService {
                 },
                 {
                   title_uz: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  title_en: {
                     contains: search,
                     mode: 'insensitive',
                   },
@@ -330,6 +358,8 @@ export class ProductsService {
         amount: updateProductDto?.amount || product.amount,
         description_ru:
           updateProductDto?.description_ru || product.description_ru,
+        description_en:
+          updateProductDto?.description_en || product.description_en,
         description_uz:
           updateProductDto?.description_uz || product.description_uz,
         discountAmount:
@@ -341,9 +371,11 @@ export class ProductsService {
         inStock: updateProductDto?.inStock || product.inStock,
         title_ru: updateProductDto?.title_ru || product.title_ru,
         title_uz: updateProductDto?.title_uz || product.title_uz,
+        title_en: updateProductDto?.title_en || product.title_en,
         categoryId: updateProductDto?.categoryId || product.categoryId,
         extraInfoRu: updateProductDto?.extraInfoRu || product.extraInfoRu,
         extraInfoUz: updateProductDto?.extraInfoUz || product.extraInfoUz,
+        extraInfoEn: updateProductDto?.extraInfoEn || product.extraInfoEn,
       },
     });
 
@@ -437,6 +469,7 @@ export class ProductsService {
         id: true,
         title_ru: true,
         title_uz: true,
+        title_en: true,
         amount: true,
         inStock: true,
         discountAmount: true,

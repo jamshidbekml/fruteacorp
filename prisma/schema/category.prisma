@@ -1,6 +1,7 @@
 model Categories {
   id        String     @id @default(uuid()) @db.Uuid
   title_uz  String
+  title_en  String
   title_ru  String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt

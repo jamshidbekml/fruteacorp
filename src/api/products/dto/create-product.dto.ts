@@ -67,6 +67,16 @@ export class CreateProductDto implements Partial<Products> {
   title_uz: string;
 
   @ApiProperty({
+    description: `Field to enter product's title`,
+    required: true,
+    type: 'string',
+  })
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
+  title_en: string;
+
+  @ApiProperty({
     description: `Field to enter product's category`,
     required: true,
     type: 'string',
@@ -105,6 +115,16 @@ export class CreateProductDto implements Partial<Products> {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
+  description_en?: string;
+
+  @ApiProperty({
+    description: `Field to enter product's description`,
+    required: true,
+    type: 'string',
+  })
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
   extraInfoUz?: string;
 
   @ApiProperty({
@@ -116,6 +136,16 @@ export class CreateProductDto implements Partial<Products> {
   @IsNotEmpty()
   @IsString()
   extraInfoRu?: string;
+
+  @ApiProperty({
+    description: `Field to enter product's description`,
+    required: true,
+    type: 'string',
+  })
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  extraInfoEn?: string;
 
   @ApiProperty({
     description: `Field to enter product's status`,
