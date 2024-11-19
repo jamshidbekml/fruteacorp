@@ -154,7 +154,7 @@ export class CategoriesService {
         WITH RECURSIVE CategoryHierarchy AS (
         SELECT id
         FROM categories
-        WHERE id = ${id}  -- Asosiy kategoriya ID (masalan, 1)
+        WHERE id = ${id}::uuid  -- Asosiy kategoriya ID (masalan, 1)
 
         UNION ALL
 
