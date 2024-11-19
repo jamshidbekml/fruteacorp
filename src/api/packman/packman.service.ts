@@ -204,7 +204,7 @@ export class PackmanService {
 
   async findOne(userId: string, orderId: string) {
     const order = await this.prismaService.orders.findUnique({
-      where: { id: orderId, operatorId: userId },
+      where: { id: orderId, packmanId: userId },
       select: {
         items: {
           include: {
