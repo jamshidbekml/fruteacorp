@@ -150,17 +150,30 @@ export class CategoriesService {
   async remove(id: string) {
     const category = await this.findOne(id);
 
-    const withProducts = await this.prismaService.categories.findUnique({
-      where: {
-        id: category.id,
-      },
-      select: {
-        products: true,
-      },
-    });
+    const products = await this.prismaService.$queryRaw`
+        WITH RECURSIVE CategoryHierarchy AS (
+        SELECT id
+        FROM categories
+        WHERE id = ${id}  -- Asosiy kategoriya ID (masalan, 1)
 
-    if (withProducts.products.length > 0)
+        UNION ALL
+
+        -- Barcha bolalar kategoriyalarini qo'shish
+        SELECT c.id
+        FROM categories c
+        INNER JOIN CategoryHierarchy ch ON c."parentId" = ch.id
+        )
+        SELECT p.*
+        FROM products p
+        WHERE p."categoryId" IN (SELECT id FROM CategoryHierarchy);
+    `;
+
+    if (Array.isArray(products) && products.length > 0)
       throw new NotFoundException("Kategoriyani o'chirish imkoni yo'q!");
+
+    await this.prismaService.categories.delete({
+      where: { id: category.id },
+    });
 
     return 'Kategoriya muvaffaqiyatli o`chirildi!';
   }
