@@ -114,7 +114,7 @@ export class ExelService {
             item.id,
             item.title_ru,
             start.toLocaleDateString() + ' - ' + end.toLocaleDateString(),
-            Number(item.totalQuantity),
+            item.totalQuantity,
             item.totalAmount ? Number(item.totalAmount).toFixed(2) : '0.00',
           ]);
         }
