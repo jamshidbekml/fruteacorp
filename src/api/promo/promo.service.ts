@@ -102,7 +102,11 @@ export class PromoService {
     });
 
     const currentDate = new Date();
-    if (!promo || !promo.active || promo.expiresAt < currentDate)
+    if (
+      !promo ||
+      !promo.active ||
+      promo.expiresAt.getTime() < currentDate.getTime()
+    )
       throw new BadRequestException('Bunday promokod mavjud emas!');
 
     if (promo.activeFrom && body.amount < promo.activeFrom)

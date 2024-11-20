@@ -12,6 +12,11 @@ export class ProductsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createProductDto: CreateProductDto) {
+    if (createProductDto.discountExpiresAt.getDay() < new Date().getDay()) {
+      throw new BadRequestException(
+        'discountExpiresAt must be greater than today',
+      );
+    }
     await this.prismaService.$transaction(async (prisma) => {
       const product = await prisma.products.create({
         data: {
@@ -343,6 +348,14 @@ export class ProductsService {
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
+    if (
+      updateProductDto.discountExpiresAt &&
+      updateProductDto.discountExpiresAt.getDay() < new Date().getDay()
+    ) {
+      throw new BadRequestException(
+        'discountExpiresAt must be greater than today',
+      );
+    }
     const product = await this.findOne(id);
 
     if (product.active && updateProductDto?.active === false) {

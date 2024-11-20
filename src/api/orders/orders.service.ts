@@ -140,18 +140,6 @@ export class OrdersService {
                 : Number(product.Product.amount),
           },
         });
-
-        // await prisma.products.update({
-        //   where: { id: product.productId },
-        //   data: {
-        //     inStock: {
-        //       decrement: product.quantity,
-        //     },
-        //     sold: {
-        //       increment: product.quantity,
-        //     },
-        //   },
-        // });
       }
 
       await this.prismaService.cart.delete({

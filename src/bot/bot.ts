@@ -319,10 +319,14 @@ export class MyBot {
         });
 
         for await (const operator of operators) {
-          bot.api.sendMessage(operator.telegramId, messages.order_data(order), {
-            parse_mode: 'HTML',
-            reply_markup: InlineKeyboards.confirm_order_operator(orderId),
-          });
+          bot.api.sendMessage(
+            operator.telegramId,
+            messages.operator_order_data(order),
+            {
+              parse_mode: 'HTML',
+              reply_markup: InlineKeyboards.confirm_order_operator(orderId),
+            },
+          );
         }
       }
     } catch (err) {
@@ -385,7 +389,7 @@ export class MyBot {
 
           await bot.api.sendMessage(
             packman.telegramId,
-            messages.order_data(order),
+            messages.packman_order_data(order),
             {
               parse_mode: 'HTML',
               reply_markup: InlineKeyboards.confirm_order_packman(orderId),

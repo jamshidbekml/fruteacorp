@@ -49,6 +49,40 @@ export class TasksService implements OnModuleInit {
     }
   }
 
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async checkOrders() {
+    await this.prismaService.promoCodes.updateMany({
+      where: {
+        expiresAt: {
+          lte: new Date(),
+        },
+      },
+      data: {
+        active: false,
+      },
+    });
+
+    await this.prismaService.products.updateMany({
+      where: {
+        discountExpiresAt: {
+          lte: new Date(),
+        },
+      },
+      data: {
+        discountStatus: 'inactive',
+      },
+    });
+
+    await this.prismaService.orders.deleteMany({
+      where: {
+        createdAt: {
+          lte: new Date(new Date().setDate(new Date().getDate() - 7)),
+        },
+        status: 'created',
+      },
+    });
+  }
+
   onModuleInit() {
     this.tokenUpdater();
   }
