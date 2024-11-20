@@ -108,6 +108,8 @@ export class ExelService {
         ORDER BY totalQuantity DESC;
       `;
 
+      console.log(data);
+
       if (data.length > 0) {
         for (const item of data) {
           result.push([
