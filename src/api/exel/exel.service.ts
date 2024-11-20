@@ -154,6 +154,8 @@ export class ExelService {
           user_address ua ON o."addressId" = ua.id
       LEFT JOIN 
           areas a ON ua."deliveryAreaId" = a.id
+      WHERE 
+          u.role = 'user'
       GROUP BY 
           u.id, u.phone, u."firstName", u."lastName", a."areaRU"
       ORDER BY 
