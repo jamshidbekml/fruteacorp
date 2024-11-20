@@ -354,14 +354,18 @@ export class ProductsService {
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     if (
       updateProductDto.discountExpiresAt &&
-      updateProductDto.discountExpiresAt.getDay() < new Date().getDay()
+      new Date(updateProductDto.discountExpiresAt) < today
     ) {
       throw new BadRequestException(
         'discountExpiresAt must be greater than today',
       );
     }
+
     const product = await this.findOne(id);
 
     if (product.active && updateProductDto?.active === false) {
