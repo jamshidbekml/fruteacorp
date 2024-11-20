@@ -12,7 +12,10 @@ export class ProductsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createProductDto: CreateProductDto) {
-    if (createProductDto.discountExpiresAt.getDay() < new Date().getDay()) {
+    if (
+      createProductDto.discountExpiresAt &&
+      createProductDto.discountExpiresAt.getDay() < new Date().getDay()
+    ) {
       throw new BadRequestException(
         'discountExpiresAt must be greater than today',
       );
