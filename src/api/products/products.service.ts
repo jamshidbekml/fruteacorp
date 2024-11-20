@@ -145,6 +145,7 @@ export class ProductsService {
           select: { image: { select: { name: true } }, isMain: true },
         },
         inStock: true,
+        sold: true,
       },
       skip: (page - 1) * limit,
       take: limit,
