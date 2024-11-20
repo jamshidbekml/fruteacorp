@@ -142,10 +142,6 @@ export class OrdersService {
         });
       }
 
-      await this.prismaService.cart.delete({
-        where: { id: createOrderDto.cartId },
-      });
-
       if (createOrderDto.paymentType === $Enums.PAYMENT_TYPE.payme) {
         return {
           order,

@@ -198,6 +198,10 @@ export class ClickService {
       },
     });
 
+    await this.prismaService.cart.deleteMany({
+      where: { userId: order.userId },
+    });
+
     this.botService.sendOrderToOperators(order.id);
 
     for await (const item of order.items) {
