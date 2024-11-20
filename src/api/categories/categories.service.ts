@@ -108,7 +108,31 @@ export class CategoriesService {
     const data = await this.prismaService.categories.findUnique({
       where: { id },
       include: {
-        childCategories: true,
+        childCategories: {
+          include: {
+            childCategories: {
+              include: {
+                childCategories: {
+                  include: {
+                    childCategories: {
+                      include: {
+                        childCategories: {
+                          include: {
+                            childCategories: {
+                              include: {
+                                childCategories: true,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
         parent: {
           include: {
             parent: {
@@ -117,7 +141,15 @@ export class CategoriesService {
                   include: {
                     parent: {
                       include: {
-                        parent: true,
+                        parent: {
+                          include: {
+                            parent: {
+                              include: {
+                                parent: true,
+                              },
+                            },
+                          },
+                        },
                       },
                     },
                   },
